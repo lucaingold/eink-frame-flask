@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <div id="spinner-container">
+        <div class="spinner"></div>
+    </div>
+    <div class="picture-container"></div>
+    <script src="{{ url_for('static', filename='js/items.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
