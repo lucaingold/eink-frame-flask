@@ -27,5 +27,5 @@ def unsplash_api():
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=8080)
-    app.run(host="192.168.0.20", port=5000, debug=True)
+    app.run(host='0.0.0.0', port=8080)
+    # app.run(host="192.168.0.20", port=5000, debug=True)
