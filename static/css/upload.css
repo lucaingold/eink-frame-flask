@@ -1,0 +1,24 @@
+.label {
+    cursor: pointer;
+}
+
+.progress {
+    display: none;
+    margin-bottom: 1rem;
+}
+
+.alert {
+    display: none;
+}
+
+.img-container img {
+    max-width: 100%;
+}
+
+.img-container img {
+    max-width: 100%;
+}
+
+/*.cropper-container {*/
+/*    width: 100% !important;*/
+/*}*/

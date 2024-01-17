@@ -5,25 +5,19 @@
     color: white;
     font-family: 'Titillium Web', sans-serif;
 }
+
+:root {
+    --bs-primary: #ff0000; /* Replace with your desired color */
+}
+
 html,body{
     overflow: hidden;
     background-color: #000000;
     color: white;
 }
 
-main{
-    position: fixed;
-    top:0;
-    left: 0;
-    width:100%;
-    height: 100%;
-    overflow: scroll;
-    margin: 0;
-    padding: 0;
-}
-
 header *{
-    z-index: 100;
+    /*z-index: 100;*/
     background-color: #161616;
     color: white !important;
 }
@@ -93,83 +87,42 @@ header {
     margin-bottom: 3px;
 }
 
-.picture-container{
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #161616;
+    --bs-btn-border-color: #fff;
+    --bs-btn-hover-color: #161616;
+    --bs-btn-hover-bg: #fff;
+    --bs-btn-hover-border-color: #fff;
+    --bs-btn-focus-shadow-rgb: 49,132,253;
+    --bs-btn-active-color: #161616;
+    --bs-btn-active-bg: #fff;
+    --bs-btn-active-border-color: #fff;
+}
+
+.btn-primary:hover .fas{
+    color: #161616;
+    border-color: #fff;
+}
+
+.modal-backdrop {
+    background-color: #000000;
+}
+
+.modal-body{
     position: relative;
-    width: 100%;
-    display: flex;
-    gap: 10px;
-    padding: 88px 2vw;
+    flex: 1 1 auto;
+    padding: 0;
+    margin: 0;
+    width: fit-content;
 }
 
-.column{
-    flex:1;
-    display: flex;
-    flex-direction: column;
-    gap:10px;
-}
-.post{
-    position: relative;
-    overflow: hidden;
-    width:100%;
+.modal-header{
+    background-color: #161616;
+    border-bottom-color: #161616;
 }
 
-img{
-    width: 100%;
-    border-radius: 5px;
-    height: 100%;
+.modal-footer{
+    background-color: #161616;
+    border-top-color: #161616;
 }
-
-.overlay{
-    position: absolute;
-    top:0;
-    left: 0;
-    width:100%;
-    height:100%;
-    background:#161616;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity:0;
-    transition:0.5s;
-    border-radius: 5px;
-}
-
-.post:hover .overlay{
-    opacity: 0.5;
-    cursor: pointer;
-}
-
-/*# spinner*/
-
-#spinner-container {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: black; /* Black background */
-    border: 5px white;
-    padding: 50px; /* Adjust padding for better visibility */
-    border-radius: 15px; /* Rounded corners */
-    z-index: 1000; /* Higher z-index to ensure it's in front */
-}
-
-.spinner {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 7px solid transparent;
-    border-top-color: #fff;
-    animation: spin 1s linear infinite, fadeInOut 1.5s ease-in-out infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeInOut {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-

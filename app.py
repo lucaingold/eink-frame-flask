@@ -1,12 +1,14 @@
 from flask import Flask, render_template
+import os
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def image_selector():
-    title = "Image Selector"
-    return render_template('selector.html', title='Select Image')
+    pictures_folder = os.path.join(app.static_folder, 'pictures')
+    pictures_paths = [os.path.join('pictures', filename) for filename in os.listdir(pictures_folder) if filename.endswith(('.jpeg'))]
+    return render_template('selector.html', title='Select Image', images=sorted(pictures_paths))
 
 
 @app.route('/upload')

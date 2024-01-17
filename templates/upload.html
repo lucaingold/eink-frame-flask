@@ -1,4 +1,208 @@
 {% extends "base.html" %}
+{% block header %}
+    <!-- Custom styles for this template -->
+    {#    <link rel="stylesheet" href="{{ url_for('static', filename='css/croppie.css') }}"/>#}
+    {#    <link rel="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.css" crossorigin="anonymous" />#}
+    {#    <link rel="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" crossorigin="anonymous" />#}
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="https://fengyuanchen.github.io/cropperjs/css/cropper.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}"/>
+{% endblock %}
 {% block content %}
-    <div class="test"></div>
+
+    <div style="height: 200px;"></div>
+
+    <div class="container">
+        <h1>Upload cropped image to server</h1>
+        <p>Rotate the image by +90 degrees when the image is vertically aligned.</p>
+        <label class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload Image
+            <input type="file" class="sr-only" id="input" name="image" accept="image/*">
+        </label>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"
+                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
+            </div>
+        </div>
+
+        <div class="alert" role="alert"></div>
+
+        <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="modalLabel">Crop the image</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="img-container">
+                            <img id="image" class="img-fluid">
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary" data-method="rotate" data-option="-45"
+                                    title="Rotate Left">
+            <span class="docs-tooltip" data-toggle="tooltip" title="cropper.rotate(-45)">
+              <span class="fa fa-undo-alt"></span>
+            </span>
+                            </button>
+                            <button type="button" class="btn btn-primary" data-method="rotate" data-option="45"
+                                    title="Rotate Right">
+            <span class="docs-tooltip" data-toggle="tooltip" title="cropper.rotate(45)">
+              <span class="fa fa-redo-alt"></span>
+            </span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="crop">Crop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script src="https://fengyuanchen.github.io/cropperjs/js/cropper.js" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            var avatar = document.getElementById('avatar');
+            var image = document.getElementById('image');
+            var input = document.getElementById('input');
+            var $progress = $('.progress');
+            var $progressBar = $('.progress-bar');
+            var $alert = $('.alert');
+            var $modal = $('#modal');
+            var cropper;
+
+            $('[data-toggle="tooltip"]').tooltip();
+
+            input.addEventListener('change', function (e) {
+                var files = e.target.files;
+                var done = function (url) {
+                    input.value = '';
+                    image.src = url;
+                    $alert.hide();
+                    $modal.modal('show');
+                };
+                var reader;
+                var file;
+                var url;
+
+                if (files && files.length > 0) {
+                    file = files[0];
+
+                    if (URL) {
+                        done(URL.createObjectURL(file));
+                    } else if (FileReader) {
+                        reader = new FileReader();
+                        reader.onload = function (e) {
+                            done(reader.result);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+
+            $modal.on('shown.bs.modal', function () {
+                cropper = new Cropper(image, {
+                    dragMode: 'move',
+                    aspectRatio: 16 / 9,
+                    {#autoCropArea: 0.65,#}
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    rotate: true,
+                    highlight: false,
+                    cropBoxMovable: false,
+                    cropBoxResizable: false,
+                    toggleDragModeOnDblclick: false,
+                    {#minCanvasHeight: 1200,#}
+                    {#minCanvasWidth: 1600#}
+                    maxHeight: 1600,
+                    maxWidth: 1200,
+                    viewMode: 3,
+                    autoCropArea: 1,
+                    modal: false,
+
+                    {#movable: false,#}
+                    {#zoomable: false,#}
+                    {#rotatable: false,#}
+                    {#scalable: false#}
+
+
+                });
+            }).on('hidden.bs.modal', function () {
+                cropper.destroy();
+                cropper = null;
+            });
+
+            document.getElementById('crop').addEventListener('click', function () {
+                var initialAvatarURL;
+                var canvas;
+
+                $modal.modal('hide');
+
+                if (cropper) {
+                    canvas = cropper.getCroppedCanvas({
+                        width: 1600,
+                        height: 1200,
+                    });
+                    {#.toDataURL(ORIGINAL_MIME_TYPE);#}
+                    initialAvatarURL = avatar.src;
+                    avatar.src = canvas.toDataURL();
+                    $progress.show();
+                    $alert.removeClass('alert-success alert-warning');
+                    canvas.toBlob(function (blob) {
+                        var formData = new FormData();
+
+                        formData.append('avatar', blob, 'avatar.jpg');
+                        $.ajax('https://jsonplaceholder.typicode.com/posts', {
+                            method: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+
+                            xhr: function () {
+                                var xhr = new XMLHttpRequest();
+
+                                xhr.upload.onprogress = function (e) {
+                                    var percent = '0';
+                                    var percentage = '0%';
+
+                                    if (e.lengthComputable) {
+                                        percent = Math.round((e.loaded / e.total) * 100);
+                                        percentage = percent + '%';
+                                        $progressBar.width(percentage).attr('aria-valuenow', percent).text(percentage);
+                                    }
+                                };
+
+                                return xhr;
+                            },
+
+                            success: function () {
+                                $alert.show().addClass('alert-success').text('Upload success');
+                            },
+
+                            error: function () {
+                                avatar.src = initialAvatarURL;
+                                $alert.show().addClass('alert-warning').text('Upload error');
+                            },
+
+                            complete: function () {
+                                $progress.hide();
+                            },
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+
+
 {% endblock %}

@@ -1,9 +1,35 @@
 {% extends "base.html" %}
+{% block header %}
+    <!-- Custom styles for this site -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/selector.css') }}"/>
+{% endblock %}
 {% block content %}
-    <div id="spinner-container">
-        <div class="spinner"></div>
-    </div>
-    <div class="picture-container"></div>
+    <main>
+        <div id="spinner-container">
+            <div class="spinner"></div>
+        </div>
+        <div class="picture-container"></div>
+    </main>
+
+    <script>
+        const posts = [];
+        const images = {{ images|tojson|safe }};
+        let imageIndex = 0;
+
+        for (let i = 1; i <= images.length; i++) {
+            let item = {
+                id: i,
+                title: `Click to send to Ink-Frame`,
+                image: `static/` + images[imageIndex],
+                path: `path=./` + images[imageIndex].replace('.jpeg', '.bmp'),
+            };
+            console.log(images[imageIndex])
+            posts.push(item);
+            imageIndex++;
+            if (imageIndex > images.length - 1) imageIndex = 0;
+        }
+    </script>
+
     <script src="{{ url_for('static', filename='js/items.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

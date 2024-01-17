@@ -50,7 +50,7 @@ function showImage(path) {
   // }, 4000);
 
   $.ajax({
-    url: 'http://frame.local:8080',
+    url: 'http://inkframe.local:8080',
     type: 'POST',
     contentType: 'text/plain',
     data: path,
