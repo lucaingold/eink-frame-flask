@@ -37,16 +37,16 @@ def unsplash_api():
 def load_image_by_path():
     try:
         data = request.get_json()
-        if 'url' in data:
+        if 'path' in data:
             image_path = data['path']
             if os.path.isfile(image_path):
                 pil_image = Image.open(image_path)
                 frameInstance.display_image_on_epd(pil_image)
                 return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
             else:
-                return jsonify({'status': 'error', 'message': 'File for provided URL ' + image_path + ' does not exist.'})
+                return jsonify({'status': 'error', 'message': 'File for provided path ' + image_path + ' does not exist.'})
         else:
-            return jsonify({'status': 'error', 'message': 'URL not provided in the request body'})
+            return jsonify({'status': 'error', 'message': 'Path not provided in the request body'})
 
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
