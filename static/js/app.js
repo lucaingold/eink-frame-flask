@@ -39,21 +39,11 @@ function generateMasonryGrid(columns, posts) {
 
 function showImage(path) {
   $('#spinner-container').show();
-
-  // // Simulate an AJAX request delay (remove this in your actual code)
-  // setTimeout(function() {
-  //   // Simulated successful response
-  //   console.log('Success');
-  //
-  //   // Hide the spinner when the request is complete
-  //   $('#spinner-container').hide();
-  // }, 4000);
-
   $.ajax({
-    url: 'http://inkframe.local:8080',
+    url: 'http://inkframe.local:8080/load',
     type: 'POST',
-    contentType: 'text/plain',
-    data: path,
+    contentType: 'application/json',
+    data: JSON.stringify({ "path": path }),
     success: function(response) {
       console.log('Success:', response);
     },
