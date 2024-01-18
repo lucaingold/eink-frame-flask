@@ -1,8 +1,14 @@
 from flask import Flask, render_template
 import os
 
-app = Flask(__name__)
+from hw.frame import EInkFrame
 
+file_path = os.getcwd()
+
+frameInstance = EInkFrame()
+frameInstance.run()
+
+app = Flask(__name__)
 
 @app.route('/')
 def image_selector():

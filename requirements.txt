@@ -1,0 +1,5 @@
+git+https://github.com/robweber/omni-epd.git#egg=omni-epd
+Flask
+requests
+numpy
+pillow
