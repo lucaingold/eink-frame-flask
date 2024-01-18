@@ -39,11 +39,12 @@ def load_image_by_path():
         data = request.get_json()
         if 'url' in data:
             image_path = data['path']
-            pil_image = Image.open(image_path)
-
-            frameInstance.display_image_on_epd(pil_image)
-
-            return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
+            if os.path.isfile(image_path):
+                pil_image = Image.open(image_path)
+                frameInstance.display_image_on_epd(pil_image)
+                return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
+            else:
+                return jsonify({'status': 'error', 'message': 'File for provided URL ' + image_path + ' does not exist.'})
         else:
             return jsonify({'status': 'error', 'message': 'URL not provided in the request body'})
 
