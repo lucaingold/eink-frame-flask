@@ -21,7 +21,7 @@
                 id: i,
                 title: `Click to send to Ink-Frame`,
                 image: `static/` + images[imageIndex],
-                path: `static/images/` + images[imageIndex].replace('.jpeg', '.bmp'),
+                path: `static/images` + images[imageIndex].replace('pictures', '').replace('.jpeg', '.bmp'),
             };
             console.log(images[imageIndex])
             posts.push(item);
