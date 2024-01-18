@@ -1,7 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 import os
 
 from hw.frame import EInkFrame
+from PIL import Image
 
 file_path = os.getcwd()
 
@@ -30,6 +31,24 @@ def ai_generator():
 @app.route('/api')
 def unsplash_api():
     return render_template('api.html',title='API Search (Unslash)')
+
+
+@app.route('/load', methods=['POST'])
+def load_image_by_path():
+    try:
+        data = request.get_json()
+        if 'url' in data:
+            image_path = data['path']
+            pil_image = Image.open(image_path)
+
+            frameInstance.display_image_on_epd(pil_image)
+
+            return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
+        else:
+            return jsonify({'status': 'error', 'message': 'URL not provided in the request body'})
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
 
 
 if __name__ == '__main__':

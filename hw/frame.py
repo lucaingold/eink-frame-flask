@@ -96,3 +96,15 @@ class EInkFrame:
             width = height
             height = temp
         return width, height
+
+    def display_image_on_epd(self, display_image):
+        # Rotate image back to save
+        display_image = display_image.rotate(-0, expand=1)
+        logging.info("Prepare epaper")
+        self.epd.prepare()
+
+        self.epd.display(display_image)
+
+        logging.info("Send epaper to sleep")
+        self.epd.close()
+        return
