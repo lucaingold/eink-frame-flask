@@ -40,7 +40,7 @@ function generateMasonryGrid(columns, posts) {
 function showImage(path) {
   $('#spinner-container').show();
   $.ajax({
-    url: 'http://inkframe.local:8080/load',
+    url: '/load',
     type: 'POST',
     contentType: 'application/json',
     data: JSON.stringify({ "path": path }),

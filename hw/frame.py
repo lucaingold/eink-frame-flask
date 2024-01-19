@@ -7,7 +7,9 @@ from hw.image_functions import ImageFunctions
 from constants import ConfigConst
 from hw.config_wrapper import Configs
 
-DISPLAY_TYPE = "waveshare_epd.it8951"
+# DISPLAY_TYPE = "waveshare_epd.it8951"
+
+DISPLAY_TYPE = "omni_epd.mock"
 
 
 class EInkFrame:
@@ -112,8 +114,9 @@ class EInkFrame:
 
         self.image_display = display_image.copy()
 
-        if self.image_display.mode not in ["RGB", "RGBA"]:
-            self.image_display = self.image_display.convert("RGB")
+        # result.resize((w, h))
+        # if self.image_display.mode not in ["RGB", "RGBA"]:
+        #     self.image_display = self.image_display.convert("RGB")
 
         # Rotate image back to save
         # display_image = display_image.rotate(-0, expand=1)
