@@ -111,7 +111,7 @@
             $modal.on('shown.bs.modal', function () {
                 cropper = new Cropper(image, {
                     dragMode: 'move',
-                    {#autoCropArea: 0.65,#}
+                    aspectRatio: 1600 / 1200,
                     restore: false,
                     guides: true,
                     center: true,
@@ -120,10 +120,10 @@
                     cropBoxMovable: false,
                     cropBoxResizable: false,
                     toggleDragModeOnDblclick: false,
-                    minCanvasHeight: 1200,
-                    minCanvasWidth: 1600,
-                    maxHeight: 1200,
-                    maxWidth: 1600,
+                    {#minCanvasHeight: 1200,#}
+                    {#minCanvasWidth: 1600,#}
+                    {#maxHeight: 1200,#}
+                    {#maxWidth: 1600,#}
                     viewMode: 3,
                     autoCropArea: 1,
                     modal: false,
