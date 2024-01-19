@@ -110,17 +110,17 @@ class EInkFrame:
 
     def display_image_on_epd(self, display_image):
 
-        self.image_display = self.image_base.copy()
+        self.image_display = display_image.copy()
 
-        if self.image_base.mode not in ["RGB", "RGBA"]:
-            self.image_base = self.image_base.convert("RGB")
+        if self.image_display.mode not in ["RGB", "RGBA"]:
+            self.image_display = self.image_display.convert("RGB")
 
         # Rotate image back to save
         # display_image = display_image.rotate(-0, expand=1)
         logging.info("Prepare epaper")
         self.epd.prepare()
 
-        self.epd.display(display_image)
+        self.epd.display(self.image_display)
 
         logging.info("Send epaper to sleep")
         self.epd.close()
