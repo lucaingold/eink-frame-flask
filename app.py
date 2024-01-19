@@ -53,7 +53,7 @@ def send_image():
 
     # Use ImageOps.exif_transpose to handle image orientation
     if original_image.width < original_image.height:
-        original_image = original_image.transpose(method=Image.Transpose.ROTATE_90)
+        original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
 
 
     # Resize the image to 1600x1200
