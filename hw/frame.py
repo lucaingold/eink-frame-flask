@@ -37,6 +37,7 @@ class EInkFrame:
     def run(self):
         logging.info("einkframe has begun")
         try:
+            self.config_dict['VCOM'] = -2.27
             self.epd = displayfactory.load_display_driver(DISPLAY_TYPE, self.config_dict)
             # If display is mock, apply height and width to it
 
@@ -122,7 +123,6 @@ class EInkFrame:
         # display_image = display_image.rotate(-0, expand=1)
         logging.info("Prepare epaper")
         self.epd.prepare()
-        self.epd.clear()
 
         self.epd.display(self.image_display)
 
