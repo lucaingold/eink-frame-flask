@@ -75,6 +75,8 @@ window.addEventListener('DOMContentLoaded', function () {
     var image = document.getElementById('uploadedAvatar');
     var input = document.getElementById('file-input');
     var cropBtn = document.getElementById('crop');
+    var rotateRightBtn = document.getElementById('rotateRight');
+    var rotateLeftBtn = document.getElementById('rotateLeft');
 
     var $modal = $('#cropAvatarmodal');
     var cropper;
@@ -110,9 +112,6 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
-
-
     $modal.on('shown.bs.modal', function () {
         cropper = new Cropper(image, {
             aspectRatio: 1,
@@ -121,6 +120,16 @@ window.addEventListener('DOMContentLoaded', function () {
     }).on('hidden.bs.modal', function () {
         cropper.destroy();
         cropper = null;
+    });
+
+    rotateRightBtn.addEventListener('click', function () {
+        console.log("rotated img by 90 degree");
+        cropper.rotate(90);
+    });
+
+    rotateLeftBtn.addEventListener('click', function () {
+        console.log("rotated img by -90 degree");
+        cropper.rotate(-90);
     });
 
     cropBtn.addEventListener('click', function () {

@@ -3,13 +3,16 @@ from io import BytesIO
 from PIL.Image import Resampling
 from flask import Flask, render_template, jsonify, request, send_file
 import os
+import json
 
 from hw.frame import EInkFrame
+# from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
 file_path = os.getcwd()
 
 frameInstance = EInkFrame()
+# frameInstance = EInkFrameMock()
 frameInstance.run()
 
 app = Flask(__name__)
@@ -36,6 +39,26 @@ def ai_generator():
 @app.route('/api')
 def unsplash_api():
     return render_template('api.html', title='API Search (Unslash)')
+
+
+@app.route('/uploadImage', methods=['POST'])
+def upload():
+    # Access the file from the request
+    uploaded_file = request.files['file']
+    if uploaded_file:
+        # Read the image using PIL
+        try:
+            original_image = Image.open(uploaded_file)
+            # Resize the image to 1600x1200
+            target_width = 1600
+            target_height = 1200
+            resized_image = original_image.resize((target_width, target_height))
+            frameInstance.display_image_on_epd(resized_image)
+        except Exception as e:
+            return jsonify({'error': 'Failed to process image'}), 500
+        return json.dumps({'status': 'success', 'message': 'File uploaded successfully'})
+    else:
+        return json.dumps({'status': 'error', 'message': 'No file received'})
 
 
 @app.route('/sendImage', methods=['POST'])

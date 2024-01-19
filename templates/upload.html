@@ -39,24 +39,22 @@
                         <div class="img-container">
                             <img id="image" class="img-fluid">
                         </div>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-primary" data-method="rotate" data-option="-45"
-                                    title="Rotate Left">
-            <span class="docs-tooltip" data-toggle="tooltip" title="cropper.rotate(-45)">
-              <span class="fa fa-undo-alt"></span>
-            </span>
-                            </button>
-                            <button type="button" class="btn btn-primary" data-method="rotate" data-option="45"
-                                    title="Rotate Right">
-            <span class="docs-tooltip" data-toggle="tooltip" title="cropper.rotate(45)">
-              <span class="fa fa-redo-alt"></span>
-            </span>
-                            </button>
-                        </div>
                     </div>
                     <div class="modal-footer">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary rotateBtn" id="rotateLeft" title="Rotate Left" value="-90">
+                                <span class="docs-tooltip" data-toggle="tooltip" title="cropper.rotate(-90)">
+                                  <span class="fa fa-undo-alt"></span>
+                                </span>
+                            </button>
+                            <button type="button" class="btn btn-primary rotateBtn" id="rotateRight" title="Rotate Right" value="90">
+                                <span class="docs-tooltip" data-toggle="tooltip" title="cropper.rotate(90)">
+                                    <span class="fa fa-redo-alt"></span>
+                                </span>
+                            </button>
+                        </div>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="crop">Crop</button>
+                        <button type="button" class="btn btn-primary" id="crop">Send to Frame</button>
                     </div>
                 </div>
             </div>
@@ -79,6 +77,7 @@
             var $alert = $('.alert');
             var $modal = $('#modal');
             var cropper;
+            var rotateBtn = document.getElementsByClassName('rotateBtn');
 
             $('[data-toggle="tooltip"]').tooltip();
 
@@ -142,6 +141,22 @@
                 cropper = null;
             });
 
+            {#rotateBtn.addEventListener('click', function () {#}
+            {#    let rotateValue = $(".rotateBtn").attr("value");#}
+            {#    console.log("rotated img by " + rotateValue);#}
+            {#    cropper.rotate(rotateValue);#}
+
+            document.getElementById('rotateRight').addEventListener('click', function () {
+                console.log("rotated img by 90 degree");
+                cropper.rotate(90);
+            });
+
+            document.getElementById('rotateLeft').addEventListener('click', function () {
+                console.log("rotated img by -90 degree");
+                cropper.rotate(-90);
+            });
+
+
             document.getElementById('crop').addEventListener('click', function () {
                 var initialAvatarURL;
                 var canvas;
@@ -154,15 +169,12 @@
                         height: 1200,
                     });
                     {#.toDataURL(ORIGINAL_MIME_TYPE);#}
-                    initialAvatarURL = avatar.src;
-                    avatar.src = canvas.toDataURL();
                     $progress.show();
                     $alert.removeClass('alert-success alert-warning');
                     canvas.toBlob(function (blob) {
                         var formData = new FormData();
-
-                        formData.append('avatar', blob, 'avatar.jpg');
-                        $.ajax('https://jsonplaceholder.typicode.com/posts', {
+                        formData.append('file', blob);
+                        $.ajax('/uploadImage', {
                             method: 'POST',
                             data: formData,
                             processData: false,
@@ -186,7 +198,7 @@
                             },
 
                             success: function () {
-                                $alert.show().addClass('alert-success').text('Upload success');
+                                {#$alert.show().addClass('alert-success').text('Upload success');#}
                             },
 
                             error: function () {
