@@ -40,6 +40,7 @@ img{
     width: 100%;
     border-radius: 5px;
     height: 100%;
+    filter: grayscale(100%);
 }
 
 .overlay{
@@ -95,4 +96,3 @@ img{
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
-
