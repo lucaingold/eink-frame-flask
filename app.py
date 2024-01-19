@@ -51,6 +51,9 @@ def send_image():
     except Exception as e:
         return jsonify({'error': 'Failed to process image'}), 500
 
+
+    ow = original_image.width
+    oh = original_image.height
     # Use ImageOps.exif_transpose to handle image orientation
     if original_image.width < original_image.height:
         original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
@@ -75,7 +78,7 @@ def send_image():
 
 
 # Return the BMP image bytes as the response
-    return jsonify({'status': 'success', 'result': 'image processed'})
+    return jsonify({'status': 'success', 'result': 'image processed' + 'W: ' + oh + ' H: ' + ow})
 
 @app.route('/load', methods=['POST'])
 def load_image_by_path():
