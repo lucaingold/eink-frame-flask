@@ -1,11 +1,11 @@
 from io import BytesIO
 
 from PIL.Image import Resampling
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_file
 import os
 
 from hw.frame import EInkFrame
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ExifTags
 
 file_path = os.getcwd()
 
@@ -91,16 +91,24 @@ def send_image():
 
     # Return the BMP image bytes as the response
     #     return jsonify({'status': 'success', 'result': 'image processed' + 'W: ' + oh + ' H: ' + ow})
-    return jsonify({'message': 'BMP image processed successfully ' + 'W: ' + oh + ' H: ' + ow,
-                    'bmp_image': bmp_buffer.getvalue().decode('latin-1')})
+    # return jsonify({'message': 'BMP image processed successfully ' + 'W: ' + oh + ' H: ' + ow,
+    #                 'bmp_image': bmp_buffer.getvalue().decode('latin-1')})
+
+    return send_file(BytesIO(bmp_buffer.getvalue()), mimetype='image/bmp', as_attachment=True, download_name='processed_image.bmp')
+
 
 
 def get_orientation(image):
     # Check if image has EXIF orientation information
-    if 'Orientation' in image._getexif():
-        return image._getexif()['Orientation']
-    else:
-        return None
+    try:
+        for tag, value in image._getexif().items():
+            if ExifTags.TAGS.get(tag) == 'Orientation':
+                return value
+    except (AttributeError, KeyError, TypeError, IndexError):
+        pass
+
+    return None
+
 
 
 @app.route('/load', methods=['POST'])
