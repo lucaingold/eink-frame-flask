@@ -9,6 +9,7 @@ from hw.config_wrapper import Configs
 
 DISPLAY_TYPE = "waveshare_epd.it8951"
 
+
 class EInkFrame:
     def __init__(self, file_path=os.getcwd()):
 
@@ -44,6 +45,16 @@ class EInkFrame:
 
             # Set width and height for einkframe program
             self.width, self.height = self.set_rotate(self.epd.width, self.epd.height, image_rotate)
+
+            # draw = ImageDraw.Draw(self.image_display, "RGBA")
+            # self.add_text_to_image(draw, 'resources/fonts/Font.ttc', self.image_display.height, self.width,
+            #                        'Title', 'Text', 30, 10, 10, 150, 20, 14, True, True,
+            #                        crop_left, crop_right)
+
+
+
+
+
 
         except EPDNotFoundError:
             logging.error(f"Couldn't find {DISPLAY_TYPE}")
@@ -98,8 +109,14 @@ class EInkFrame:
         return width, height
 
     def display_image_on_epd(self, display_image):
+
+        self.image_display = self.image_base.copy()
+
+        if self.image_base.mode not in ["RGB", "RGBA"]:
+            self.image_base = self.image_base.convert("RGB")
+
         # Rotate image back to save
-        display_image = display_image.rotate(-0, expand=1)
+        # display_image = display_image.rotate(-0, expand=1)
         logging.info("Prepare epaper")
         self.epd.prepare()
 
