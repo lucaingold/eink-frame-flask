@@ -42,7 +42,7 @@ def load_image_by_path():
             if os.path.isfile(image_path):
                 pil_image = Image.open(image_path)
                 frameInstance.display_image_on_epd(pil_image)
-                return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
+                return jsonify({'status': 'success', 'result': os.getcwd() + ' ...image with path' + image_path + ' processed'})
             else:
                 return jsonify({'status': 'error', 'message': 'File for provided path ' + image_path + ' does not exist.'})
         else:
