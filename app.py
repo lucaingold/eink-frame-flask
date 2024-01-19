@@ -14,26 +14,28 @@ frameInstance.run()
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def image_selector():
     pictures_folder = os.path.join(app.static_folder, 'pictures')
-    pictures_paths = [os.path.join('pictures', filename) for filename in os.listdir(pictures_folder) if filename.endswith(('.jpeg'))]
+    pictures_paths = [os.path.join('pictures', filename) for filename in os.listdir(pictures_folder) if
+                      filename.endswith(('.jpeg'))]
     return render_template('selector.html', title='Select Image', images=sorted(pictures_paths))
 
 
 @app.route('/upload')
 def image_upload():
-    return render_template('upload.html',title='Upload Image')
+    return render_template('upload.html', title='Upload Image')
 
 
 @app.route('/ai')
 def ai_generator():
-    return render_template('ai.html',title='Ai Generator (Stable Diffusion)')
+    return render_template('ai.html', title='Ai Generator (Stable Diffusion)')
 
 
 @app.route('/api')
 def unsplash_api():
-    return render_template('api.html',title='API Search (Unslash)')
+    return render_template('api.html', title='API Search (Unslash)')
 
 
 @app.route('/sendImage', methods=['POST'])
@@ -51,13 +53,24 @@ def send_image():
     except Exception as e:
         return jsonify({'error': 'Failed to process image'}), 500
 
-
     ow = str(original_image.width)
     oh = str(original_image.height)
-    # Use ImageOps.exif_transpose to handle image orientation
-    if original_image.width < original_image.height:
-        original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
 
+    orientation = get_orientation(original_image)
+
+    if orientation:
+        # Use EXIF orientation information
+        if orientation == 3:
+            original_image = original_image.transpose(method=Image.Transpose.ROTATE_180)
+        elif orientation == 6:
+            original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
+        elif orientation == 8:
+            original_image = original_image.transpose(method=Image.Transpose.ROTATE_90)
+        # Additional cases can be added based on the specific orientation values
+    else:
+        # If no EXIF information, use width < height condition
+        if original_image.width < original_image.height:
+            original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
 
     # Resize the image to 1600x1200
     target_width = 1600
@@ -76,9 +89,19 @@ def send_image():
 
     frameInstance.display_image_on_epd(bmp_image)
 
+    # Return the BMP image bytes as the response
+    #     return jsonify({'status': 'success', 'result': 'image processed' + 'W: ' + oh + ' H: ' + ow})
+    return jsonify({'message': 'BMP image processed successfully ' + 'W: ' + oh + ' H: ' + ow,
+                    'bmp_image': bmp_buffer.getvalue().decode('latin-1')})
 
-# Return the BMP image bytes as the response
-    return jsonify({'status': 'success', 'result': 'image processed' + 'W: ' + oh + ' H: ' + ow})
+
+def get_orientation(image):
+    # Check if image has EXIF orientation information
+    if 'Orientation' in image._getexif():
+        return image._getexif()['Orientation']
+    else:
+        return None
+
 
 @app.route('/load', methods=['POST'])
 def load_image_by_path():
@@ -91,7 +114,8 @@ def load_image_by_path():
                 frameInstance.display_image_on_epd(pil_image)
                 return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
             else:
-                return jsonify({'status': 'error', 'message': 'File for provided path ' + image_path + ' does not exist.'})
+                return jsonify(
+                    {'status': 'error', 'message': 'File for provided path ' + image_path + ' does not exist.'})
         else:
             return jsonify({'status': 'error', 'message': 'Path not provided in the request body'})
 
