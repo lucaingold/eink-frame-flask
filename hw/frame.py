@@ -7,9 +7,9 @@ from hw.image_functions import ImageFunctions
 from constants import ConfigConst
 from hw.config_wrapper import Configs
 
-# DISPLAY_TYPE = "waveshare_epd.it8951"
+DISPLAY_TYPE = "waveshare_epd.it8951"
 
-DISPLAY_TYPE = "omni_epd.mock"
+# DISPLAY_TYPE = "omni_epd.mock"
 
 
 class EInkFrame:
