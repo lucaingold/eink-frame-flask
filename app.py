@@ -52,7 +52,9 @@ def send_image():
         return jsonify({'error': 'Failed to process image'}), 500
 
     # Use ImageOps.exif_transpose to handle image orientation
-    original_image = ImageOps.exif_transpose(original_image)
+    if original_image.width < original_image.height:
+        original_image = original_image.transpose(method=Image.Transpose.ROTATE_90)
+
 
     # Resize the image to 1600x1200
     target_width = 1600
