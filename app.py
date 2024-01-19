@@ -23,7 +23,7 @@ def image_selector():
     pictures_folder = os.path.join(app.static_folder, 'pictures')
     pictures_paths = [os.path.join('pictures', filename) for filename in os.listdir(pictures_folder) if
                       filename.endswith(('.jpeg'))]
-    return render_template('selector.html', title='Select Imagetest', images=sorted(pictures_paths))
+    return render_template('selector.html', title='Select Image', images=sorted(pictures_paths))
 
 
 @app.route('/upload')
@@ -50,27 +50,27 @@ def upload():
         try:
             original_image = Image.open(uploaded_file)
             # Resize the image to 1600x1200
-            target_width = 1600
-            target_height = 1200
-            resized_image = original_image.resize((target_width, target_height))
+            # target_width = 1600
+            # target_height = 1200
+            # resized_image = original_image.resize((target_width, target_height))
+            #
+            # orientation = get_orientation(original_image)
+            #
+            # if orientation:
+            #     # Use EXIF orientation information
+            #     if orientation == 3:
+            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_180)
+            #     elif orientation == 6:
+            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
+            #     elif orientation == 8:
+            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_90)
+            #     # Additional cases can be added based on the specific orientation values
+            # else:
+            #     # If no EXIF information, use width < height condition
+            #     if resized_image.width < resized_image.height:
+            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
 
-            orientation = get_orientation(original_image)
-
-            if orientation:
-                # Use EXIF orientation information
-                if orientation == 3:
-                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_180)
-                elif orientation == 6:
-                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
-                elif orientation == 8:
-                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_90)
-                # Additional cases can be added based on the specific orientation values
-            else:
-                # If no EXIF information, use width < height condition
-                if resized_image.width < resized_image.height:
-                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
-
-            frameInstance.display_image_on_epd(resized_image)
+            frameInstance.display_image_on_epd(original_image)
         except Exception as e:
             return jsonify({'error': 'Failed to process image'}), 500
         return json.dumps({'status': 'success', 'message': 'File uploaded successfully'})
