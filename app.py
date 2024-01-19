@@ -96,6 +96,9 @@ def send_image():
     ow = str(original_image.width)
     oh = str(original_image.height)
 
+    print(' h:' + oh)
+    print(' w:' + ow)
+
     orientation = get_orientation(original_image)
 
     if orientation:
