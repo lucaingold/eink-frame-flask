@@ -5,7 +5,7 @@ from flask import Flask, render_template, jsonify, request
 import os
 
 from hw.frame import EInkFrame
-from PIL import Image
+from PIL import Image, ImageOps
 
 file_path = os.getcwd()
 
@@ -51,10 +51,13 @@ def send_image():
     except Exception as e:
         return jsonify({'error': 'Failed to process image'}), 500
 
+    # Use ImageOps.exif_transpose to handle image orientation
+    original_image = ImageOps.exif_transpose(original_image)
+
     # Resize the image to 1600x1200
     target_width = 1600
     target_height = 1200
-    resized_image = original_image.resize((target_width, target_height), Resampling.BILINEAR)
+    resized_image = original_image.resize((target_width, target_height))
 
     # If the image needs to be cropped to the exact dimensions
     # you can add additional logic here based on your requirements
