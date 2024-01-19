@@ -121,7 +121,8 @@ class EInkFrame:
 
         # Rotate image back to save
         # display_image = display_image.rotate(-0, expand=1)
-        display_image = display_image.rotate(90, expand=1)
+        display_image = display_image.rotate(-0, expand=1)
+        # display_image = display_image.rotate(90, expand=1)
 
 
 
