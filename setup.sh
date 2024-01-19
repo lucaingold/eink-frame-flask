@@ -72,12 +72,12 @@ function install_service(){
     if ! (service_installed); then
       # install the service files and enable
       copy_service_file
-      sudo systemctl enable pycasso
+      sudo systemctl enable einkframe
 
       echo -e "einkframe service installed! Use '${GREEN}sudo systemctl restart einkframe${RESET}' to test"
     else
       echo -e "${YELLOW}einkframe service is installed, checking if it needs an update${RESET}"
-      if ! (cmp -s "einkframe.service" "/etc/systemd/system/pycasso.service"); then
+      if ! (cmp -s "einkframe.service" "/etc/systemd/system/einkframe.service"); then
         copy_service_file
         echo -e "Updating einkframe service file"
       else
