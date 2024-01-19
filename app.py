@@ -53,6 +53,23 @@ def upload():
             target_width = 1600
             target_height = 1200
             resized_image = original_image.resize((target_width, target_height))
+
+            orientation = get_orientation(original_image)
+
+            if orientation:
+                # Use EXIF orientation information
+                if orientation == 3:
+                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_180)
+                elif orientation == 6:
+                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
+                elif orientation == 8:
+                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_90)
+                # Additional cases can be added based on the specific orientation values
+            else:
+                # If no EXIF information, use width < height condition
+                if resized_image.width < resized_image.height:
+                    resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
+
             frameInstance.display_image_on_epd(resized_image)
         except Exception as e:
             return jsonify({'error': 'Failed to process image'}), 500
