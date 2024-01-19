@@ -49,6 +49,10 @@ def upload():
         # Read the image using PIL
         try:
             original_image = Image.open(uploaded_file)
+            ow = str(original_image.width)
+            oh = str(original_image.height)
+            print(' h:' + oh)
+            print(' w:' + ow)
             # Resize the image to 1600x1200
             # target_width = 1600
             # target_height = 1200
@@ -73,7 +77,7 @@ def upload():
             frameInstance.display_image_on_epd(original_image)
         except Exception as e:
             return jsonify({'error': 'Failed to process image'}), 500
-        return json.dumps({'status': 'success', 'message': 'File uploaded successfully'})
+        return json.dumps({'status': 'success', 'message': 'File uploaded successfully' + ' h:' + oh + ' w:' + ow})
     else:
         return json.dumps({'status': 'error', 'message': 'No file received'})
 
@@ -95,9 +99,6 @@ def send_image():
 
     ow = str(original_image.width)
     oh = str(original_image.height)
-
-    print(' h:' + oh)
-    print(' w:' + ow)
 
     orientation = get_orientation(original_image)
 
