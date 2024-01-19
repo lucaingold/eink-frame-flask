@@ -122,6 +122,7 @@ class EInkFrame:
         # display_image = display_image.rotate(-0, expand=1)
         logging.info("Prepare epaper")
         self.epd.prepare()
+        self.epd.clear()
 
         self.epd.display(self.image_display)
 
