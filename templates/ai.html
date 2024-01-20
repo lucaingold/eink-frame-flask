@@ -26,6 +26,8 @@
 
     <script>
         $(document).ready(function () {
+            var $progress = $('.progress');
+            var $progressBar = $('.progress-bar');
 
             $("#generateButton").on("click", function () {
                 let promptValue = $("#prompt").val();
@@ -61,8 +63,7 @@
                         },
 
                         error: function () {
-                            avatar.src = initialAvatarURL;
-                            $alert.show().addClass('alert-warning').text('Upload error');
+                            console.log('Upload error');
                         },
 
                         complete: function () {

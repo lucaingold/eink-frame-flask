@@ -14,7 +14,7 @@ API_KEY = 'sk-S05RrvORkvGgWnE2wg952awDz7bJIdkWKjCAHpz8mIx5VvOY'
 def get_image_from_string(prompt):
     global img
     try:
-        fetch_height = 1200
+        fetch_height = 1280
         fetch_width = 1600
 
         if API_KEY is None:
@@ -47,6 +47,8 @@ def get_image_from_string(prompt):
 
         for i, image in enumerate(data["artifacts"]):
             img = Image.open(BytesIO(base64.b64decode(image["base64"])))
+
+        img.crop((1600, 1200))
         return img
     except BaseException as e:
         logging.error(e)
