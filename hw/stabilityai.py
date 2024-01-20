@@ -1,14 +1,8 @@
 import logging
-import os
-from omni_epd import displayfactory, EPDNotFoundError
 from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
 from pip._vendor.six import BytesIO
 import base64
-from hw.file_operations import FileOperations
-from hw.image_functions import ImageFunctions
-from constants import ConfigConst
-from hw.config_wrapper import Configs
-from flask import requests
+import requests
 
 DISPLAY_TYPE = "waveshare_epd.it8951"
 ENGINE_ID = "stable-diffusion-v1-6"
