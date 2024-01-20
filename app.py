@@ -9,7 +9,7 @@ from hw.frame import EInkFrame
 # from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
-from hw.stabilityai import get_image_from_string
+from hw.stabilityai import get_image_from_string, ArtType
 
 file_path = os.getcwd()
 
@@ -35,7 +35,7 @@ def image_upload():
 
 @app.route('/ai')
 def ai_generator():
-    return render_template('ai.html', title='Ai Generator (Stable Diffusion)')
+    return render_template('ai.html', title='Ai Generator (Stable Diffusion)', art_types=ArtType)
 
 
 @app.route('/api')
@@ -48,11 +48,12 @@ def generateAiImage():
     try:
         data = request.json
         prompt = data.get('prompt')
+        art_type = data.get('artType')
 
         if not prompt:
             return jsonify({'error': 'Prompt is required'}), 400
 
-        generated_image = get_image_from_string(prompt)
+        generated_image = get_image_from_string(prompt, art_type)
         frameInstance.display_image_on_epd(generated_image)
 
         return jsonify({'success': True})

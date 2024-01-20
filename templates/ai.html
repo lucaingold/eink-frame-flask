@@ -13,6 +13,18 @@
                 </button>
             </div>
         </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="artType">Art Type</label>
+            </div>
+            <select class="custom-select" id="artType">
+                {% for art_type in art_types %}
+                    <option value="{{ art_type.value }}">{{ art_type.name.replace('_', ' ').title() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="progress">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"
                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
@@ -31,10 +43,12 @@
 
             $("#generateButton").on("click", function () {
                 let promptValue = $("#prompt").val();
+                let artTypeValue = $("#artType").val();
                 if (promptValue.trim() !== "") {
                     // Create the data to be sent in the POST request
                     var postData = {
-                        prompt: promptValue
+                        prompt: promptValue,
+                        artType: artTypeValue
                     };
                     $.ajax('/generateAiImage', {
                         method: 'POST',
