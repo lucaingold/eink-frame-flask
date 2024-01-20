@@ -74,7 +74,10 @@ def get_image_from_string(prompt, art_type):
 
 def generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width):
     # Check if art_type is NONE and conditionally generate style_preset
-    style_preset = None if art_type == ArtType.NONE else art_type.value
+    if isinstance(art_type, ArtType):
+        style_preset = None if art_type == ArtType.NONE else art_type.value
+    else:
+        style_preset = None  # Handle the case where art_type is not an instance of ArtType
 
     # Construct the JSON payload
     payload = {
