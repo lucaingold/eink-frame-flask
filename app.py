@@ -9,6 +9,8 @@ from hw.frame import EInkFrame
 # from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
+from hw.stabilityai import get_image_from_string
+
 file_path = os.getcwd()
 
 frameInstance = EInkFrame()
@@ -39,6 +41,24 @@ def ai_generator():
 @app.route('/api')
 def unsplash_api():
     return render_template('api.html', title='API Search (Unslash)')
+
+
+@app.route('/generateAiImage', methods=['POST'])
+def generateAiImage():
+    try:
+        data = request.json
+        prompt = data.get('prompt')
+
+        if not prompt:
+            return jsonify({'error': 'Prompt is required'}), 400
+
+        generated_image = get_image_from_string(prompt)
+        frameInstance.display_image_on_epd(generated_image)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        # Handle exceptions as needed
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/uploadImage', methods=['POST'])
@@ -138,8 +158,8 @@ def send_image():
     # return jsonify({'message': 'BMP image processed successfully ' + 'W: ' + oh + ' H: ' + ow,
     #                 'bmp_image': bmp_buffer.getvalue().decode('latin-1')})
 
-    return send_file(BytesIO(bmp_buffer.getvalue()), mimetype='image/bmp', as_attachment=True, download_name='processed_image.bmp')
-
+    return send_file(BytesIO(bmp_buffer.getvalue()), mimetype='image/bmp', as_attachment=True,
+                     download_name='processed_image.bmp')
 
 
 def get_orientation(image):
@@ -152,7 +172,6 @@ def get_orientation(image):
         pass
 
     return None
-
 
 
 @app.route('/load', methods=['POST'])
