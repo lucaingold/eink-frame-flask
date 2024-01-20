@@ -32,7 +32,7 @@ def get_image_from_string(prompt):
             json={
                 "text_prompts": [
                     {
-                        "text": prompt
+                        "text": prompt + 'in grayscale higher contrast and white background'
                     }
                 ],
                 "cfg_scale": 7,
