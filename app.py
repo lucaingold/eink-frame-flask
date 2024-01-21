@@ -9,6 +9,7 @@ from hw.frame import EInkFrame
 # from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
+from hw.image_by_url import show_from_url
 from hw.mandelbrot import create_mandelbrot_image
 from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
 from hw.unsplash import search_photo_by_keywords
@@ -49,6 +50,11 @@ def unsplash_api():
 @app.route('/mandelbrot')
 def mandelbrot():
     return render_template('mandelbrot.html', title='Mandelbrot Set')
+
+
+@app.route('/url')
+def mandelbrot():
+    return render_template('url.html', title='Show by url')
 
 
 @app.route('/generateAiImage', methods=['POST'])
@@ -229,6 +235,25 @@ def calculate_mandelbrot_image():
     try:
         mandelbrot_img = create_mandelbrot_image()
         frameInstance.display_image_on_epd(mandelbrot_img)
+        return jsonify({'success': True})
+    except Exception as e:
+        # Handle exceptions as needed
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/loadImage', methods=['POST'])
+def load_image_from_url():
+    try:
+        data = request.json
+        url = data.get('urlValue')
+        orientation = data.get('orientationType')
+
+        if not url:
+            return jsonify({'error': 'URL is required'}), 400
+
+        img = show_from_url(url, orientation)
+        frameInstance.display_image_on_epd(img)
+
         return jsonify({'success': True})
     except Exception as e:
         # Handle exceptions as needed
