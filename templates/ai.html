@@ -1,29 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
+
+    <style>
+        .buttonMiddle{
+            margin-right: 0 !important;
+            border-radius: 0;
+        }
+
+        .buttonRight{
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-left: 0;
+        }
+    </style>
+
     <div style="height: 200px;"></div>
 
     <div class="container">
         <h1>AI Image Generator</h1>
         <p>Generate an image with custom prompts using the text field below:</p>
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" id="prompt" placeholder="Enter your prompt...">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="button" id="generateButton">
-                    <i class="fas fa-magic"></i> Generate Image
-                </button>
-            </div>
+        <div class="input-group mb-3 p-0">
+                <input type="text" class="form-control" id="prompt" placeholder="Enter your prompt ...">
+                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0" id="artType">
+                        <option value="" disabled selected>Select Style</option>
+                        {% for art_type in art_types %}
+                            <option value="{{ art_type.value }}">{{ art_type.name.replace('_', ' ').title() }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary buttonRight" type="button" id="generateButton">
+                        <i class="fas fa-magic"></i> Generate Image
+                    </button>
         </div>
 
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text" for="artType">Art Type</label>
-            </div>
-            <select class="custom-select" id="artType">
-                {% for art_type in art_types %}
-                    <option value="{{ art_type.value }}">{{ art_type.name.replace('_', ' ').title() }}</option>
-                {% endfor %}
-            </select>
-        </div>
 
         <div class="progress">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"

@@ -100,6 +100,10 @@ header {
     --bs-btn-active-border-color: #fff;
 }
 
+.progress {
+    --bs-progress-bar-bg: #444
+}
+
 .btn-primary:hover .fas{
     color: #161616;
     border-color: #fff;
