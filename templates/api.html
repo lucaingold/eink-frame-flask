@@ -1,4 +1,114 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="test"></div>
+
+    <style>
+        .buttonMiddle {
+            margin-right: 0 !important;
+            border-radius: 0;
+        }
+
+        .buttonRight {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-left: 0;
+        }
+
+
+        .fullWidth {
+            width: 100%;
+        }
+    </style>
+
+    <div style="height: 200px;"></div>
+
+    <div class="container">
+        <h1>API Photograph Search</h1>
+        <p>Search a photo for custom keywords using the text field below:</p>
+        <div class="input-group mb-3 p-0">
+            <input type="text" class="form-control" id="keywords" placeholder="Enter search keywords ...">
+            <button class="btn btn-primary buttonRight" type="button" id="generateButton">
+                <i class="fas fa-magic"></i> Search Photo
+            </button>
+        </div>
+
+
+        <div class="container">
+            <div class="row">
+                <div class="col-4 mb-3 p-0">
+                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
+                            id="orientationType">
+                        <option value="" disabled selected>Select Orientation</option>
+                        {% for orientation_type in orientation_types %}
+                            <option value="{{ orientation_type.name }}" {% if orientation_type.name == 'HORIZONTALLY' %}selected{% endif %}>{{ orientation_type.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"
+                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+        $(document).ready(function () {
+            var $progress = $('.progress');
+            var $progressBar = $('.progress-bar');
+            $progress.show();
+            $("#generateButton").on("click", function () {
+                let keywordsValue = $("#keywords").val();
+                let orientationTypeValue = $("#orientationType").val();
+                if (keywordsValue.trim() !== "") {
+                    var postData = {
+                        keywords: keywordsValue,
+                        orientationType: orientationTypeValue
+                    };
+                    $.ajax('/searchPhoto', {
+                        method: 'POST',
+                        data: JSON.stringify(postData),
+                        contentType: "application/json",
+
+                        xhr: function () {
+                            var xhr = new XMLHttpRequest();
+
+                            xhr.upload.onprogress = function (e) {
+                                var percent = '0';
+                                var percentage = '0%';
+
+                                if (e.lengthComputable) {
+                                    percent = Math.round((e.loaded / e.total) * 100);
+                                    percentage = percent + '%';
+                                    $progressBar.width(percentage).attr('aria-valuenow', percent).text(percentage);
+                                }
+                            };
+
+                            return xhr;
+                        },
+
+                        success: function () {
+                            {#$alert.show().addClass('alert-success').text('Upload success');#}
+                        },
+
+                        error: function () {
+                            console.log('Upload error');
+                        },
+
+                        complete: function () {
+                            $progress.hide();
+                        },
+                    });
+                } else {
+                    alert("Please enter keywords for searching a photo.");
+                }
+            });
+        });
+    </script>
 {% endblock %}

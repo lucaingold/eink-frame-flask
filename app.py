@@ -10,6 +10,7 @@ from hw.frame import EInkFrame
 from PIL import Image, ImageOps, ExifTags
 
 from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
+from hw.unsplash import search_photo_by_keywords
 
 file_path = os.getcwd()
 
@@ -41,7 +42,7 @@ def ai_generator():
 
 @app.route('/api')
 def unsplash_api():
-    return render_template('api.html', title='API Search (Unslash)')
+    return render_template('api.html', title='API Search (Unslash)', orientation_types=Orientation)
 
 
 @app.route('/generateAiImage', methods=['POST'])
@@ -57,6 +58,24 @@ def generateAiImage():
             return jsonify({'error': 'Prompt is required'}), 400
 
         generated_image = get_image_from_string(prompt, art_type, engine_type, orientation)
+        frameInstance.display_image_on_epd(generated_image)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        # Handle exceptions as needed
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/searchPhoto', methods=['POST'])
+def search_photo():
+    try:
+        data = request.json
+        keywords = data.get('keywords')
+        orientation = data.get('orientationType')
+
+        if not keywords:
+            return jsonify({'error': 'Keywords are required'}), 400
+        generated_image = search_photo_by_keywords(keywords, orientation)
         frameInstance.display_image_on_epd(generated_image)
 
         return jsonify({'success': True})

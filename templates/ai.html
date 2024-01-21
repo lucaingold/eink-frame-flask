@@ -58,10 +58,17 @@
                             id="orientationType">
                         <option value="" disabled selected>Select Orientation</option>
                         {% for orientation_type in orientation_types %}
-                            <option value="{{ orientation_type.name }}">{{ orientation_type.value }}</option>
+                            <option value="{{ orientation_type.name }}" {% if orientation_type.name == 'HORIZONTALLY' %}selected{% endif %}>{{ orientation_type.value }}</option>
                         {% endfor %}
                     </select>
                 </div>
+                <div class="form-check" style="margin-bottom: 15px">
+                    <input class="form-check-input" type="checkbox" value="" id="optimize">
+                    <label class="form-check-label" for="optimize">
+                        Optimize for e-ink frame
+                    </label>
+                </div>
+
             </div>
         </div>
 
@@ -87,6 +94,10 @@
                 let artTypeValue = $("#artType").val();
                 let engineTypeValue = $("#engineType").val();
                 let orientationTypeValue = $("#orientationType").val();
+                let optimizedIsChecked = $("#optimize").prop("checked");
+                if(optimizedIsChecked){
+                    promptValue += ', grayscale, high constast between motive and background';
+                }
                 if (promptValue.trim() !== "") {
                     var postData = {
                         prompt: promptValue,
