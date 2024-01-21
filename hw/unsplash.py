@@ -25,7 +25,6 @@ def search_photo_by_keywords(keywords, orientation, is_random):
 
         data = trigger_request(orientation, keywords, is_random)
 
-        regular_url = data["results"][0]["urls"]["regular"]
         response = requests.get(regular_url)
 
         img = Image.open(BytesIO(response.content))
@@ -74,4 +73,7 @@ def trigger_request(orientation, keywords, is_random):
     if response.status_code != 200:
         raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
     data = response.json()
-    return data
+    if is_random:
+        return data["urls"]["regular"]
+    else:
+        return data["results"][0]["urls"]["regular"]

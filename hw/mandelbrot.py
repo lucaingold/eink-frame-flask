@@ -17,7 +17,7 @@ def mandelbrot(c, max_iter):
         return n  # Point is not in the Mandelbrot set
 
 
-def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=80):
+def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=20):
     try:
 
         img = Image.new('RGB', (SCREEN_WIDTH, SCREEN_HEIGHT), 'black')
