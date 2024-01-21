@@ -23,9 +23,9 @@ def search_photo_by_keywords(keywords, orientation, is_random):
         if CLIENT_ID is None:
             raise Exception("Missing client id key.")
 
-        data = trigger_request(orientation, keywords, is_random)
+        url = trigger_request(orientation, keywords, is_random)
 
-        response = requests.get(regular_url)
+        response = requests.get(url)
 
         img = Image.open(BytesIO(response.content))
 
