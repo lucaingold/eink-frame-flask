@@ -9,7 +9,7 @@ from hw.frame import EInkFrame
 # from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
-from hw.stabilityai import get_image_from_string, ArtType
+from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
 
 file_path = os.getcwd()
 
@@ -35,7 +35,8 @@ def image_upload():
 
 @app.route('/ai')
 def ai_generator():
-    return render_template('ai.html', title='Ai Generator (Stable Diffusion)', art_types=ArtType)
+    return render_template('ai.html', title='Ai Generator (Stable Diffusion)', art_types=ArtType,
+                           engines=list_engines(), orientation_types=Orientation)
 
 
 @app.route('/api')
@@ -49,11 +50,13 @@ def generateAiImage():
         data = request.json
         prompt = data.get('prompt')
         art_type = data.get('artType')
+        engine_type = data.get('engineType')
+        orientation = data.get('orientationType')
 
         if not prompt:
             return jsonify({'error': 'Prompt is required'}), 400
 
-        generated_image = get_image_from_string(prompt, art_type)
+        generated_image = get_image_from_string(prompt, art_type, engine_type, orientation)
         frameInstance.display_image_on_epd(generated_image)
 
         return jsonify({'success': True})

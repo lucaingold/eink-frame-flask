@@ -2,15 +2,20 @@
 {% block content %}
 
     <style>
-        .buttonMiddle{
+        .buttonMiddle {
             margin-right: 0 !important;
             border-radius: 0;
         }
 
-        .buttonRight{
+        .buttonRight {
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             margin-left: 0;
+        }
+
+
+        .fullWidth {
+            width: 100%;
         }
     </style>
 
@@ -20,16 +25,44 @@
         <h1>AI Image Generator</h1>
         <p>Generate an image with custom prompts using the text field below:</p>
         <div class="input-group mb-3 p-0">
-                <input type="text" class="form-control" id="prompt" placeholder="Enter your prompt ...">
-                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0" id="artType">
+            <input type="text" class="form-control" id="prompt" placeholder="Enter your prompt ...">
+            <button class="btn btn-primary buttonRight" type="button" id="generateButton">
+                <i class="fas fa-magic"></i> Generate Image
+            </button>
+        </div>
+
+
+        <div class="container">
+            <div class="row">
+                <div class="col-4 mb-3 p-0">
+                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
+                            id="artType">
                         <option value="" disabled selected>Select Style</option>
                         {% for art_type in art_types %}
                             <option value="{{ art_type.value }}">{{ art_type.name.replace('_', ' ').title() }}</option>
                         {% endfor %}
                     </select>
-                    <button class="btn btn-primary buttonRight" type="button" id="generateButton">
-                        <i class="fas fa-magic"></i> Generate Image
-                    </button>
+                </div>
+                <div class="col-4 mb-3 p-0">
+                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
+                            id="engineType">
+                        <option value="" disabled selected>Select Engine</option>
+                        {% for id, description in engines.items() %}
+                            <option value="{{ id }}"{% if id == 'stable-diffusion-v1-6' %}
+                                    selected{% endif %}>{{ description }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-4 mb-3 p-0">
+                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
+                            id="engineType">
+                        <option value="" disabled selected>Select Orientation</option>
+                        {% for orientation_type in orientation_types %}
+                            <option value="{{ orientation_type.value }}">{{ orientation_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
         </div>
 
 
@@ -48,15 +81,18 @@
         $(document).ready(function () {
             var $progress = $('.progress');
             var $progressBar = $('.progress-bar');
-
+            $progress.show();
             $("#generateButton").on("click", function () {
                 let promptValue = $("#prompt").val();
                 let artTypeValue = $("#artType").val();
+                let engineTypeValue = $("#engineType").val();
+                let orientationTypeValue = $("#orientationType").val();
                 if (promptValue.trim() !== "") {
-                    // Create the data to be sent in the POST request
                     var postData = {
                         prompt: promptValue,
-                        artType: artTypeValue
+                        artType: artTypeValue,
+                        engineType: engineTypeValue,
+                        orientationType: orientationTypeValue
                     };
                     $.ajax('/generateAiImage', {
                         method: 'POST',
