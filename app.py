@@ -42,7 +42,7 @@ def ai_generator():
 
 @app.route('/api')
 def unsplash_api():
-    return render_template('api.html', title='API photo search (Unplash)', orientation_types=Orientation)
+    return render_template('api.html', title='API photo search (Unsplash)', orientation_types=Orientation)
 
 
 @app.route('/generateAiImage', methods=['POST'])
@@ -72,10 +72,11 @@ def search_photo():
         data = request.json
         keywords = data.get('keywords')
         orientation = data.get('orientationType')
+        is_random = data.get('isRandom')
 
         if not keywords:
             return jsonify({'error': 'Keywords are required'}), 400
-        generated_image = search_photo_by_keywords(keywords, orientation)
+        generated_image = search_photo_by_keywords(keywords, orientation, is_random)
         frameInstance.display_image_on_epd(generated_image)
 
         return jsonify({'success': True})

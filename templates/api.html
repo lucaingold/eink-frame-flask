@@ -43,6 +43,12 @@
                         {% endfor %}
                     </select>
                 </div>
+                <div class="form-check" style="margin-bottom: 15px">
+                    <input class="form-check-input" type="checkbox" value="" id="random">
+                    <label class="form-check-label" for="random">
+                        Randomize
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -66,10 +72,12 @@
             $("#generateButton").on("click", function () {
                 let keywordsValue = $("#keywords").val();
                 let orientationTypeValue = $("#orientationType").val();
+                let randomIsChecked = $("#randomIsChecked").prop("checked");
                 if (keywordsValue.trim() !== "") {
                     var postData = {
                         keywords: keywordsValue,
-                        orientationType: orientationTypeValue
+                        orientationType: orientationTypeValue,
+                        isRandom: randomIsChecked
                     };
                     $.ajax('/searchPhoto', {
                         method: 'POST',

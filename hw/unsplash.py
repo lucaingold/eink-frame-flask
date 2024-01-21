@@ -17,13 +17,13 @@ class Orientation(Enum):
     VERTICALLY = "Vertically"
 
 
-def search_photo_by_keywords(keywords, orientation):
+def search_photo_by_keywords(keywords, orientation, is_random):
     global img
     try:
         if CLIENT_ID is None:
             raise Exception("Missing client id key.")
 
-        data = trigger_request(orientation, keywords)
+        data = trigger_request(orientation, keywords, is_random)
 
         regular_url = data["results"][0]["urls"]["regular"]
         response = requests.get(regular_url)
@@ -60,12 +60,15 @@ def crop_and_resize_image(img):
         return None
 
 
-def trigger_request(orientation, keywords):
+def trigger_request(orientation, keywords, is_random):
     if orientation == Orientation.VERTICALLY.name:
         api_orientation = 'portrait'
     else:
         api_orientation = 'landscape'
-    url = f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={quote(str(keywords))}"
+    if is_random:
+        url = f"{API_HOST}/photos/random?client_id={CLIENT_ID}&orientation={api_orientation}&query={quote(str(keywords))}"
+    else:
+        url = f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={quote(str(keywords))}"
     response = requests.get(url)
     if response.status_code != 200:
         raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
