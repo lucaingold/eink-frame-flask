@@ -42,7 +42,7 @@ def ai_generator():
 
 @app.route('/api')
 def unsplash_api():
-    return render_template('api.html', title='API Search (Unslash)', orientation_types=Orientation)
+    return render_template('api.html', title='API photo search (Unplash)', orientation_types=Orientation)
 
 
 @app.route('/generateAiImage', methods=['POST'])
