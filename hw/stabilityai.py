@@ -51,13 +51,13 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
 
         payload = generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width)
         data = trigger_request(engine_type, payload, prompt)
-
+        # data = None
         print(f"Successfully generated {orientation} image with prompt '{prompt}' [{engine_type}, {art_type}]")
 
         for i, image in enumerate(data["artifacts"]):
             img = Image.open(BytesIO(base64.b64decode(image["base64"])))
 
-        if orientation == Orientation.VERTICALLY.value:
+        if orientation == Orientation.VERTICALLY.name:
             img = img.rotate(90, expand=True)
 
         img = crop_to_aspect_ratio_and_resize(img)
@@ -72,11 +72,11 @@ def set_fetch_dimensions(engine_type, orientation):
     if engine_type in ["stable-diffusion-xl-1024-v0-9", "stable-diffusion-xl-1024-v1-0"]:
         fetch_width, fetch_height = 1216, 832
     elif engine_type == "stable-diffusion-xl-beta-v2-2-2":
-        fetch_width, fetch_height = 683, 512
+        fetch_width, fetch_height = 704, 512
     else:
         fetch_width, fetch_height = 1024, 768
-
-    if orientation == Orientation.VERTICALLY.value:
+    if orientation == Orientation.VERTICALLY.name:
+        print('HEY')
         fetch_width, fetch_height = fetch_height, fetch_width
 
     return fetch_width, fetch_height
@@ -100,8 +100,8 @@ def crop_to_aspect_ratio_and_resize(image):
     else:
         # The aspect ratio is already correct, no need to crop
         cropped_image = image
-    newWidth, newHeight = image.size
-    print(f"New width: {newWidth} , new height: {newHeight}")
+    new_width, new_height = image.size
+    print(f"New width: {new_width} , new height: {new_height}")
     return cropped_image.resize((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
