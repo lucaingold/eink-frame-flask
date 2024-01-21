@@ -70,6 +70,7 @@ def trigger_request(orientation, keywords, is_random):
     else:
         url = f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={quote(str(keywords))}"
     response = requests.get(url)
+    print(url)
     if response.status_code != 200:
         raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
     data = response.json()
