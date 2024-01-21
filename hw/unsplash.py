@@ -4,6 +4,7 @@ from pip._vendor.six import BytesIO
 import base64
 import requests
 from enum import Enum
+from urllib.parse import quote
 
 API_HOST = 'https://api.unsplash.com'
 CLIENT_ID = 'W8cCQ6oXNXAktk17ibvXJlszQ2jvYDZiRc9OXfJ7p6g'
@@ -64,11 +65,9 @@ def trigger_request(orientation, keywords):
         api_orientation = 'portrait'
     else:
         api_orientation = 'landscape'
-    response = requests.get(
-        f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={keywords}"
-    )
+    url = f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={encode_as_url_parameter(quote(str(keywords)))}"
+    response = requests.get(url)
     if response.status_code != 200:
-        print(f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={keywords}")
-        raise Exception("Non-200 response: " + str(response.text))
+        raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
     data = response.json()
     return data
