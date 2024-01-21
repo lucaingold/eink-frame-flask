@@ -132,5 +132,6 @@ class EInkFrame:
         self.epd.display(self.image_display)
 
         logging.info("Send epaper to sleep")
+        self.epd.sleep()
         self.epd.close()
         return
