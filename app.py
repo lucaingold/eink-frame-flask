@@ -9,6 +9,7 @@ from hw.frame import EInkFrame
 # from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
+from hw.mandelbrot import create_mandelbrot_image
 from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
 from hw.unsplash import search_photo_by_keywords
 
@@ -45,8 +46,13 @@ def unsplash_api():
     return render_template('api.html', title='API photo search (Unsplash)', orientation_types=Orientation)
 
 
+@app.route('/mandelbrot')
+def mandelbrot():
+    return render_template('mandelbrot.html', title='Mandelbrot Set')
+
+
 @app.route('/generateAiImage', methods=['POST'])
-def generateAiImage():
+def generate_ai_image():
     try:
         data = request.json
         prompt = data.get('prompt')
@@ -216,6 +222,17 @@ def load_image_by_path():
 
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/calculateMandelbrotImage')
+def calculate_mandelbrot_image():
+    try:
+        mandelbrot_img = create_mandelbrot_image()
+        frameInstance.display_image_on_epd(mandelbrot_img)
+        return jsonify({'success': True})
+    except Exception as e:
+        # Handle exceptions as needed
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
