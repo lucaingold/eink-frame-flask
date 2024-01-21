@@ -58,7 +58,7 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
         for i, image in enumerate(data["artifacts"]):
             img = Image.open(BytesIO(base64.b64decode(image["base64"])))
 
-        if orientation == Orientation.HORIZONTALLY.value:
+        if orientation == Orientation.VERTICALLY.value:
             img = img.rotate(90, expand=True)
 
         img = img.resize((1600, 1200))
