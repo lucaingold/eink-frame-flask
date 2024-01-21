@@ -25,7 +25,6 @@ def show_from_url(url, orientation):
 
         if orientation == Orientation.VERTICALLY.name:
             img = img.rotate(-90, expand=True)
-
         print(f"Successfully found {orientation} photo for url '{url}'")
 
         return crop_and_resize_image(img)

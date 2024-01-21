@@ -65,10 +65,13 @@
             $("#generateButton").on("click", function () {
                 $progress.show();
                 let urlValue = $("#url").val();
-                if (keywordsValue.trim() !== "") {
+                let orientationTypeValue = $("#orientationType").val();
+                if (urlValue.trim() !== "") {
                     var postData = {
                         url: urlValue,
+                        orientationType: orientationTypeValue,
                     };
+                    console.log()
                     $.ajax('/loadImage', {
                         method: 'POST',
                         data: JSON.stringify(postData),

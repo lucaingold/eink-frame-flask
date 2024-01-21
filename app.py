@@ -5,8 +5,8 @@ from flask import Flask, render_template, jsonify, request, send_file
 import os
 import json
 
-from hw.frame import EInkFrame
-# from hw.frameMock import EInkFrameMock
+# from hw.frame import EInkFrame
+from hw.frameMock import EInkFrameMock
 from PIL import Image, ImageOps, ExifTags
 
 from hw.image_by_url import show_from_url
@@ -16,8 +16,8 @@ from hw.unsplash import search_photo_by_keywords
 
 file_path = os.getcwd()
 
-frameInstance = EInkFrame()
-# frameInstance = EInkFrameMock()
+# frameInstance = EInkFrame()
+frameInstance = EInkFrameMock()
 frameInstance.run()
 
 app = Flask(__name__)
