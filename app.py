@@ -245,7 +245,7 @@ def calculate_mandelbrot_image():
 def load_image_from_url():
     try:
         data = request.json
-        url = data.get('urlValue')
+        url = data.get('url')
         orientation = data.get('orientationType')
 
         if not url:
