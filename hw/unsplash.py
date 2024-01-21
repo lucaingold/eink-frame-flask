@@ -74,6 +74,6 @@ def trigger_request(orientation, keywords, is_random):
         raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
     data = response.json()
     if is_random:
-        return data["urls"]["full"]
+        return data["urls"]["regular"]
     else:
-        return data["results"][0]["urls"]["full"]
+        return data["results"][0]["urls"]["regular"]
