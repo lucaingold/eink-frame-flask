@@ -14,6 +14,7 @@ TARGET_ASPECT_RATIO = 3 / 4
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 1200
 
+
 class Orientation(Enum):
     HORIZONTALLY = "Horizontally"
     VERTICALLY = "Vertically"
@@ -50,6 +51,8 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
 
         payload = generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width)
         data = trigger_request(engine_type, payload, prompt)
+
+        print(f"Successfully generated {orientation} image with prompt '{prompt}' [{engine_type}, {art_type}]")
 
         for i, image in enumerate(data["artifacts"]):
             img = Image.open(BytesIO(base64.b64decode(image["base64"])))
@@ -97,9 +100,9 @@ def crop_to_aspect_ratio_and_resize(image):
     else:
         # The aspect ratio is already correct, no need to crop
         cropped_image = image
-
+    newWidth, newHeight = image.size
+    print(f"New width: {newWidth} , new height: {newHeight}")
     return cropped_image.resize((SCREEN_WIDTH, SCREEN_HEIGHT))
-
 
 
 def trigger_request(engine_type, payload, prompt):
@@ -115,7 +118,6 @@ def trigger_request(engine_type, payload, prompt):
     if response.status_code != 200:
         raise Exception("Non-200 response: " + str(response.text))
     data = response.json()
-    print(str('successful generated image with prompt' + prompt))
     return data
 
 
