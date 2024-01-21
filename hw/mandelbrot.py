@@ -3,8 +3,8 @@ import numpy as np
 from multiprocessing import Pool
 from PIL import Image
 
-SCREEN_WIDTH = 1600
-SCREEN_HEIGHT = 1200
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 
 def mandelbrot(c, max_iter):
@@ -37,7 +37,7 @@ def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=50):
         img_array = np.stack((r, g, b), axis=-1).astype(np.uint8)
         img = Image.fromarray(img_array, 'RGB')
 
-        return img
+        return img.resize(SCREEN_WIDTH, SCREEN_HEIGHT)
     except BaseException as e:
         logging.error(e)
         return None
