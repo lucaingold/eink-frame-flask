@@ -10,7 +10,9 @@ ENGINE_ID = "stable-diffusion-xl-beta-v2-2-2"
 CFG_SCALE = 7
 API_HOST = 'https://api.stability.ai'
 API_KEY = 'sk-S05RrvORkvGgWnE2wg952awDz7bJIdkWKjCAHpz8mIx5VvOY'
-
+TARGET_ASPECT_RATIO = 3 / 4
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 1200
 
 class Orientation(Enum):
     HORIZONTALLY = "Horizontally"
@@ -41,13 +43,7 @@ class ArtType(Enum):
 def get_image_from_string(prompt, art_type, engine_type, orientation):
     global img
     try:
-
-        if orientation == Orientation.HORIZONTALLY.value:
-            fetch_width = 1024
-            fetch_height = 768
-        else:
-            fetch_width = 768
-            fetch_height = 1024
+        fetch_width, fetch_height = set_fetch_dimensions(engine_type, orientation)
 
         if API_KEY is None:
             raise Exception("Missing Stability API key.")
@@ -61,11 +57,49 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
         if orientation == Orientation.VERTICALLY.value:
             img = img.rotate(90, expand=True)
 
-        img = img.resize((1600, 1200))
+        img = crop_to_aspect_ratio_and_resize(img)
+
         return img
     except BaseException as e:
         logging.error(e)
         return None
+
+
+def set_fetch_dimensions(engine_type, orientation):
+    if engine_type in ["stable-diffusion-xl-1024-v0-9", "stable-diffusion-xl-1024-v1-0"]:
+        fetch_width, fetch_height = 1216, 832
+    elif engine_type == "stable-diffusion-xl-beta-v2-2-2":
+        fetch_width, fetch_height = 683, 512
+    else:
+        fetch_width, fetch_height = 1024, 768
+
+    if orientation == Orientation.VERTICALLY.value:
+        fetch_width, fetch_height = fetch_height, fetch_width
+
+    return fetch_width, fetch_height
+
+
+def crop_to_aspect_ratio_and_resize(image):
+    width, height = image.size
+    current_aspect_ratio = height / width
+
+    if current_aspect_ratio > TARGET_ASPECT_RATIO:
+        new_height = int(width * TARGET_ASPECT_RATIO)
+        top = (height - new_height) // 2
+        bottom = top + new_height
+        cropped_image = image.crop((0, top, width, bottom))
+    elif current_aspect_ratio < TARGET_ASPECT_RATIO:
+        # Crop the width to achieve the target aspect ratio
+        new_width = int(height / TARGET_ASPECT_RATIO)
+        left = (width - new_width) // 2
+        right = left + new_width
+        cropped_image = image.crop((left, 0, right, height))
+    else:
+        # The aspect ratio is already correct, no need to crop
+        cropped_image = image
+
+    return cropped_image.resize((SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
 
 def trigger_request(engine_type, payload, prompt):
@@ -105,11 +139,10 @@ def list_engines():
 
 
 def generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width):
-    # Check if art_type is NONE and conditionally generate style_preset
     if isinstance(art_type, ArtType):
         style_preset = None if art_type == ArtType.NONE else art_type.value
     else:
-        style_preset = None  # Handle the case where art_type is not an instance of ArtType
+        style_preset = None
 
     # Construct the JSON payload
     payload = {

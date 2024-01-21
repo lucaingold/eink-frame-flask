@@ -39,7 +39,7 @@
                             id="artType">
                         <option value="" disabled selected>Select Style</option>
                         {% for art_type in art_types %}
-                            <option value="{{ art_type.value }}">{{ art_type.name.replace('_', ' ').title() }}</option>
+                            <option value="{{ art_type.name }}">{{ art_type.value.replace('-', ' ').title() }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -58,7 +58,7 @@
                             id="engineType">
                         <option value="" disabled selected>Select Orientation</option>
                         {% for orientation_type in orientation_types %}
-                            <option value="{{ orientation_type.value }}">{{ orientation_type.name }}</option>
+                            <option value="{{ orientation_type.name }}">{{ orientation_type.value }}</option>
                         {% endfor %}
                     </select>
                 </div>
