@@ -53,7 +53,7 @@ def mandelbrot():
 
 
 @app.route('/url')
-def mandelbrot():
+def load_by_url():
     return render_template('url.html', title='Show by url')
 
 
