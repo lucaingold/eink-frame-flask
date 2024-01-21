@@ -54,7 +54,7 @@ def mandelbrot():
 
 @app.route('/url')
 def load_by_url():
-    return render_template('url.html', title='Show by url')
+    return render_template('url.html', title='Show by url', orientation_types=Orientation)
 
 
 @app.route('/generateAiImage', methods=['POST'])
