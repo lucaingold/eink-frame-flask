@@ -3,8 +3,8 @@ import numpy as np
 from multiprocessing import Pool
 from PIL import Image
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 1200
 
 
 def mandelbrot(c, max_iter):
@@ -21,7 +21,9 @@ def mandelbrot(c, max_iter):
 
 def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=50):
     try:
-        x, y = np.meshgrid(np.linspace(xmin, xmax, SCREEN_WIDTH), np.linspace(ymin, ymax, SCREEN_HEIGHT))
+        screenWidth = 800
+        screenHeight = 600
+        x, y = np.meshgrid(np.linspace(xmin, xmax, screenWidth), np.linspace(ymin, ymax, screenHeight))
         c = x + 1j * y
         img = np.zeros(c.shape, dtype=int)
 
