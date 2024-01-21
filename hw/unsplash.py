@@ -65,7 +65,7 @@ def trigger_request(orientation, keywords):
         api_orientation = 'portrait'
     else:
         api_orientation = 'landscape'
-    url = f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={encode_as_url_parameter(quote(str(keywords)))}"
+    url = f"{API_HOST}/search/photos?client_id={CLIENT_ID}&orientation={api_orientation}&query={quote(str(keywords))}"
     response = requests.get(url)
     if response.status_code != 200:
         raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
