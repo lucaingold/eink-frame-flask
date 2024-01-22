@@ -52,8 +52,8 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
 
         payload = generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width)
         print(str(payload))
-        # data = trigger_request(engine_type, payload, prompt)
-        data = None
+        data = trigger_request(engine_type, payload, prompt)
+        # data = None
         print(f"Successfully generated {orientation} image with prompt '{prompt}' [{engine_type}, {art_type}]")
 
         for i, image in enumerate(data["artifacts"]):
