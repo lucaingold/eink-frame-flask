@@ -1,6 +1,7 @@
 import logging
-from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
-from pip._vendor.six import BytesIO
+from io import BytesIO
+
+from PIL import Image
 import base64
 import requests
 from enum import Enum
@@ -50,8 +51,9 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
             raise Exception("Missing Stability API key.")
 
         payload = generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width)
-        data = trigger_request(engine_type, payload, prompt)
-        # data = None
+        print(str(payload))
+        # data = trigger_request(engine_type, payload, prompt)
+        data = None
         print(f"Successfully generated {orientation} image with prompt '{prompt}' [{engine_type}, {art_type}]")
 
         for i, image in enumerate(data["artifacts"]):
@@ -140,12 +142,6 @@ def list_engines():
 
 
 def generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width):
-    if isinstance(art_type, ArtType):
-        style_preset = None if art_type == ArtType.NONE else art_type.value
-    else:
-        style_preset = None
-
-    # Construct the JSON payload
     payload = {
         "text_prompts": [
             {
@@ -159,8 +155,7 @@ def generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width):
         "steps": 30,
     }
 
-    # Include style_preset in the payload only if it's not NONE
-    if style_preset is not None:
-        payload["style_preset"] = style_preset
+    if art_type and art_type in ArtType.__members__ and ArtType[art_type] is not ArtType.NONE:
+        payload["style_preset"] = ArtType[art_type].value
 
     return payload

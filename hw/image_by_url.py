@@ -1,10 +1,8 @@
 import logging
-from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
+from PIL import Image
 from pip._vendor.six import BytesIO
-import base64
 import requests
 from enum import Enum
-from urllib.parse import quote
 
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 1200

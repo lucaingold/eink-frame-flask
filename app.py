@@ -8,7 +8,6 @@ from hw.mandelbrot import create_mandelbrot_image
 from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
 from hw.unsplash import search_photo_by_keywords
 from hw.frame import EInkFrame
-
 # from hw.frameMock import EInkFrameMock
 
 file_path = os.getcwd()
@@ -259,4 +258,6 @@ def load_image_from_url():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    # app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
+

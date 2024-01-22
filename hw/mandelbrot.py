@@ -1,6 +1,5 @@
 import logging
 import numpy as np
-from multiprocessing import Pool
 from PIL import Image
 
 SCREEN_WIDTH = 1600

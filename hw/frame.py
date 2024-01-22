@@ -1,14 +1,10 @@
 import logging
 import os
 from omni_epd import displayfactory, EPDNotFoundError
-from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
-from hw.file_operations import FileOperations
-from hw.image_functions import ImageFunctions
 from constants import ConfigConst
 from hw.config_wrapper import Configs
 
 DISPLAY_TYPE = "waveshare_epd.it8951"
-
 # DISPLAY_TYPE = "omni_epd.mock"
 
 
@@ -123,8 +119,6 @@ class EInkFrame:
         # display_image = display_image.rotate(-0, expand=1)
         # display_image = display_image.rotate(-0, expand=1)
         # display_image = display_image.rotate(90, expand=1)
-
-
 
         logging.info("Prepare epaper")
         self.epd.prepare()
