@@ -17,6 +17,10 @@
                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Loading ...
             </div>
         </div>
+
+        <div id="imageContainer">
+            <img id="generatedImage" style="width: 100%" src="" alt="Generated Image">
+        </div>
     </div>
 
 {% endblock %}
@@ -34,8 +38,8 @@
                     beforeSend: function () {
                     },
 
-                    success: function () {
-                        {#$alert.show().addClass('alert-success').text('Upload success');#}
+                    success: function (response) {
+                        $('#generatedImage').attr('src', 'data:image/jpeg;base64, ' + response["image"]);
                     },
 
                     error: function () {

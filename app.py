@@ -1,3 +1,4 @@
+import base64
 import os
 import json
 from io import BytesIO
@@ -68,11 +69,10 @@ def generate_ai_image():
             return jsonify({'error': 'Prompt is required'}), 400
 
         generated_image = get_image_from_string(positive_prompt, negative_prompt, art_type, engine_type, orientation)
-        frameInstance.display_image_on_epd(generated_image)
+        # frameInstance.display_image_on_epd(generated_image)
 
-        return jsonify({'success': True})
+        return return_image_json(generated_image)
     except Exception as e:
-        # Handle exceptions as needed
         return jsonify({'error': str(e)}), 500
 
 
@@ -87,11 +87,12 @@ def search_photo():
         if not keywords:
             return jsonify({'error': 'Keywords are required'}), 400
         generated_image = search_photo_by_keywords(keywords, orientation, is_random)
-        frameInstance.display_image_on_epd(generated_image)
+        # frameInstance.display_image_on_epd(generated_image)
 
-        return jsonify({'success': True})
+        return return_image_json(generated_image)
+
+
     except Exception as e:
-        # Handle exceptions as needed
         return jsonify({'error': str(e)}), 500
 
 
@@ -192,8 +193,7 @@ def send_image():
     # return jsonify({'message': 'BMP image processed successfully ' + 'W: ' + oh + ' H: ' + ow,
     #                 'bmp_image': bmp_buffer.getvalue().decode('latin-1')})
 
-    return send_file(BytesIO(bmp_buffer.getvalue()), mimetype='image/bmp', as_attachment=True,
-                     download_name='processed_image.bmp')
+    return jsonify({'success': True})
 
 
 def get_orientation(image):
@@ -233,7 +233,7 @@ def calculate_mandelbrot_image():
     try:
         mandelbrot_img = create_mandelbrot_image()
         frameInstance.display_image_on_epd(mandelbrot_img)
-        return jsonify({'success': True})
+        return return_image_json(mandelbrot_img)
     except Exception as e:
         # Handle exceptions as needed
         return jsonify({'error': str(e)}), 500
@@ -253,12 +253,34 @@ def load_image_from_url():
         frameInstance.display_image_on_epd(img)
 
         return jsonify({'success': True})
+
     except Exception as e:
         # Handle exceptions as needed
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/sendToFrame', methods=['POST'])
+def send_to_frame():
+    try:
+        uploaded_file = request.files['file']
+        if uploaded_file:
+            image = Image.open(uploaded_file)
+            frameInstance.display_image_on_epd(image)
+            print(1)
+            return jsonify({'success': True})
+    except Exception as e:
+        print('Error:', str(e))
+        return jsonify({'success': False, 'error': str(e)})
+
+
+def return_image_json(pil_image, format='JPEG'):
+    image_io = BytesIO()
+    pil_image.save(image_io, format=format)
+    image_bytes = image_io.getvalue()
+    encoded_img = base64.b64encode(image_bytes).decode('ascii')
+    return jsonify({'success': True, "image": encoded_img})
+
+
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=8080, debug=True)
     app.run(host='0.0.0.0', port=8080, debug=False)
-

@@ -1,6 +1,6 @@
-*{
-    margin:0;
-    padding:0;
+* {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
     color: white;
     font-family: 'Titillium Web', sans-serif;
@@ -10,13 +10,13 @@
     --bs-primary: #ff0000; /* Replace with your desired color */
 }
 
-html,body{
+html, body {
     overflow: hidden;
     background-color: #000000;
     color: white;
 }
 
-header *{
+header * {
     /*z-index: 100;*/
     background-color: #161616;
     color: white !important;
@@ -41,7 +41,7 @@ header {
 }
 
 
-.navbar small{
+.navbar small {
     padding-left: 15px;
     font-size: 13px;
 }
@@ -51,16 +51,17 @@ header {
     outline: none !important;
     box-shadow: none !important;
 }
-.navbar-brand{
+
+.navbar-brand {
     color: white;
     margin-left: 2.6em;
 }
 
-.navbar-brand:hover{
+.navbar-brand:hover {
     color: white;
 }
 
-.navbar-toggler-icon{
+.navbar-toggler-icon {
     color: white;
 }
 
@@ -94,7 +95,7 @@ header {
     --bs-btn-hover-color: #161616;
     --bs-btn-hover-bg: #fff;
     --bs-btn-hover-border-color: #fff;
-    --bs-btn-focus-shadow-rgb: 49,132,253;
+    --bs-btn-focus-shadow-rgb: 49, 132, 253;
     --bs-btn-active-color: #161616;
     --bs-btn-active-bg: #fff;
     --bs-btn-active-border-color: #fff;
@@ -104,7 +105,7 @@ header {
     --bs-progress-bar-bg: #444
 }
 
-.btn-primary:hover .fas{
+.btn-primary:hover .fas {
     color: #161616;
     border-color: #fff;
 }
@@ -113,7 +114,7 @@ header {
     background-color: #000000;
 }
 
-.modal-body{
+.modal-body {
     position: relative;
     flex: 1 1 auto;
     padding: 0;
@@ -121,12 +122,12 @@ header {
     width: fit-content;
 }
 
-.modal-header{
+.modal-header {
     background-color: #161616;
     border-bottom-color: #161616;
 }
 
-.modal-footer{
+.modal-footer {
     background-color: #161616;
     border-top-color: #161616;
 }
@@ -136,3 +137,4 @@ header {
     background-color: #000;
     border-color: #fff;
 }
+
