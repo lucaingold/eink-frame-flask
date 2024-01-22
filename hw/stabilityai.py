@@ -42,7 +42,7 @@ class ArtType(Enum):
     TILE_TEXTURE = "tile-texture"
 
 
-def get_image_from_string(prompt, art_type, engine_type, orientation):
+def get_image_from_string(positive_prompt, negative_prompt, art_type, engine_type, orientation):
     global img
     try:
         fetch_width, fetch_height = set_fetch_dimensions(engine_type, orientation)
@@ -50,11 +50,11 @@ def get_image_from_string(prompt, art_type, engine_type, orientation):
         if API_KEY is None:
             raise Exception("Missing Stability API key.")
 
-        payload = generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width)
+        payload = generate_style_preset_payload(positive_prompt, negative_prompt, art_type, fetch_height, fetch_width)
         print(str(payload))
-        data = trigger_request(engine_type, payload, prompt)
+        data = trigger_request(engine_type, payload)
         # data = None
-        print(f"Successfully generated {orientation} image with prompt '{prompt}' [{engine_type}, {art_type}]")
+        print(f"Successfully generated {orientation} image with positive prompt '{positive_prompt}' [{engine_type}, {art_type}, {negative_prompt}]")
 
         for i, image in enumerate(data["artifacts"]):
             img = Image.open(BytesIO(base64.b64decode(image["base64"])))
@@ -106,7 +106,7 @@ def crop_to_aspect_ratio_and_resize(image):
     return cropped_image.resize((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
-def trigger_request(engine_type, payload, prompt):
+def trigger_request(engine_type, payload):
     response = requests.post(
         f"{API_HOST}/v1/generation/{engine_type}/text-to-image",
         headers={
@@ -141,11 +141,12 @@ def list_engines():
         print(f"Error: {response.status_code} , Description: {response.reason}")
 
 
-def generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width):
+def generate_style_preset_payload(positive_prompt, negative_prompt, art_type, fetch_height, fetch_width):
     payload = {
         "text_prompts": [
             {
-                "text": prompt
+                "text": positive_prompt,
+                "weight": 1
             }
         ],
         "cfg_scale": CFG_SCALE,
@@ -154,6 +155,12 @@ def generate_style_preset_payload(prompt, art_type, fetch_height, fetch_width):
         "samples": 1,
         "steps": 30,
     }
+
+    if negative_prompt and negative_prompt.strip():
+        payload["text_prompts"].append({
+            "text": negative_prompt,
+            "weight": -1
+        })
 
     if art_type and art_type in ArtType.__members__ and ArtType[art_type] is not ArtType.NONE:
         payload["style_preset"] = ArtType[art_type].value

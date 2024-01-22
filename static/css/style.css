@@ -130,3 +130,9 @@ header {
     background-color: #161616;
     border-top-color: #161616;
 }
+
+/*checkbox*/
+.form-check-input:checked {
+    background-color: #000;
+    border-color: #fff;
+}

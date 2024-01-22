@@ -58,15 +58,16 @@ def load_by_url():
 def generate_ai_image():
     try:
         data = request.json
-        prompt = data.get('prompt')
+        positive_prompt = data.get('positive_prompt')
+        negative_prompt = data.get('negative_prompt')
         art_type = data.get('artType')
         engine_type = data.get('engineType')
         orientation = data.get('orientationType')
 
-        if not prompt:
+        if not positive_prompt:
             return jsonify({'error': 'Prompt is required'}), 400
 
-        generated_image = get_image_from_string(prompt, art_type, engine_type, orientation)
+        generated_image = get_image_from_string(positive_prompt, negative_prompt, art_type, engine_type, orientation)
         frameInstance.display_image_on_epd(generated_image)
 
         return jsonify({'success': True})

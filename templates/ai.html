@@ -13,6 +13,13 @@
             margin-left: 0;
         }
 
+        .buttonIconLeft {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            margin-right: 0;
+            background: #161616;
+            border-color: #fff;
+        }
 
         .fullWidth {
             width: 100%;
@@ -25,10 +32,15 @@
         <h1>AI Image Generator</h1>
         <p>Generate an image with custom prompts using the text field below:</p>
         <div class="input-group mb-3 p-0">
-            <input type="text" class="form-control" id="prompt" placeholder="Enter your prompt ...">
+            <span class="input-group-text buttonIconLeft"><i class="fa-solid fa-terminal"></i></span>
+            <textarea class="form-control" id="positive_prompt" placeholder="enter your prompt" rows="2"></textarea>
             <button class="btn btn-primary buttonRight" type="button" id="generateButton">
                 <i class="fas fa-magic"></i> Generate Image
             </button>
+        </div>
+        <div class="input-group mb-3 p-0">
+            <span class="input-group-text buttonIconLeft"><i class="fa-solid fa-ban"></i></span>
+            <input type="text" class="form-control" id="negative_prompt" placeholder="enter words to exclude">
         </div>
 
 
@@ -91,17 +103,19 @@
             var $progressBar = $('.progress-bar');
             $("#generateButton").on("click", function () {
                 $progress.show();
-                let promptValue = $("#prompt").val();
+                let positivePromptValue = $("#positive_prompt").val();
+                let negativePromptValue = $("#negative_prompt").val();
                 let artTypeValue = $("#artType").val();
                 let engineTypeValue = $("#engineType").val();
                 let orientationTypeValue = $("#orientationType").val();
                 let optimizedIsChecked = $("#optimize").prop("checked");
                 if (optimizedIsChecked) {
-                    promptValue += ', grayscale, high constast between motive and background';
+                    positivePromptValue += ', grayscale, high constast between motive and background';
                 }
-                if (promptValue.trim() !== "") {
-                    var postData = {
-                        prompt: promptValue,
+                if (positivePromptValue.trim() !== "") {
+                    let postData = {
+                        positive_prompt: positivePromptValue,
+                        negative_prompt: negativePromptValue,
                         artType: artTypeValue,
                         engineType: engineTypeValue,
                         orientationType: orientationTypeValue
