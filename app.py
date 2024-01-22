@@ -4,26 +4,31 @@ import json
 import uuid
 from datetime import datetime
 from io import BytesIO
-from time import sleep
 
 from flask import Flask, render_template, jsonify, request, send_file
 from PIL import Image, ExifTags
-from hw.image_by_url import show_from_url
-from hw.mandelbrot import create_mandelbrot_image
-from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
-from hw.unsplash import search_photo_by_keywords
+from logic.image_by_url import show_from_url
+from logic.mandelbrot import create_mandelbrot_image
+from logic.mqtt_publisher import MqttImagePublisher
+from logic.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
+from logic.unsplash import search_photo_by_keywords
 from flask_caching import Cache
-from hw.frame import EInkFrame
-# from hw.frameMock import EInkFrameMock
+
+# from logic.frame import EInkFrame
+# from logic.frameMock import EInkFrameMock
 
 THREE_MINUTES = 180
 
 file_path = os.getcwd()
 
-frameInstance = EInkFrame()
+# frameInstance = EInkFrame()
 # frameInstance = EInkFrameMock()
 
-frameInstance.run()
+# frameInstance.run()
+
+mqtt_publisher = MqttImagePublisher("192.168.0.40", "server/image/display")
+mqtt_publisher.connect()
+mqtt_publisher.start()
 
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -137,7 +142,9 @@ def upload():
             #     if resized_image.width < resized_image.height:
             #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
 
-            frameInstance.display_image_on_epd(original_image)
+            # frameInstance.display_image_on_epd(original_image)
+            #TODO enable again...
+            mqtt_publisher.send_image(original_image)
         except Exception as e:
             return jsonify({'error': 'Failed to process image'}), 500
         return json.dumps({'status': 'success', 'message': 'File uploaded successfully' + ' h:' + oh + ' w:' + ow})
@@ -192,9 +199,11 @@ def send_image():
 
     # Save the BMP image to a BytesIO object
     bmp_buffer = BytesIO()
-    bmp_image.save(bmp_buffer, format='BMP')
+    # bmp_image.save(bmp_buffer, format='BMP')
 
-    frameInstance.display_image_on_epd(bmp_image)
+    # frameInstance.display_image_on_epd(bmp_image)
+    #TODO enable again...
+    mqtt_publisher.send_image(original_image)
 
     # Return the BMP image bytes as the response
     #     return jsonify({'status': 'success', 'result': 'image processed' + 'W: ' + oh + ' H: ' + ow})
@@ -223,8 +232,10 @@ def load_image_by_path():
         if 'path' in data:
             image_path = data['path']
             if os.path.isfile(image_path):
-                pil_image = Image.open(image_path)
-                frameInstance.display_image_on_epd(pil_image)
+                original_image = Image.open(image_path)
+                # frameInstance.display_image_on_epd(original_image)
+                #TODO enable again...
+                mqtt_publisher.send_image(original_image)
                 return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
             else:
                 return jsonify(
@@ -239,9 +250,11 @@ def load_image_by_path():
 @app.route('/calculateMandelbrotImage')
 def calculate_mandelbrot_image():
     try:
-        mandelbrot_img = create_mandelbrot_image()
-        frameInstance.display_image_on_epd(mandelbrot_img)
-        return return_image_json(mandelbrot_img)
+        original_image = create_mandelbrot_image()
+        # frameInstance.display_image_on_epd(original_image)
+        #TODO enable again...
+        mqtt_publisher.send_image(original_image)
+        return return_image_json(original_image)
     except Exception as e:
         # Handle exceptions as needed
         return jsonify({'error': str(e)}), 500
@@ -257,8 +270,10 @@ def load_image_from_url():
         if not url:
             return jsonify({'error': 'URL is required'}), 400
 
-        img = show_from_url(url, orientation)
-        frameInstance.display_image_on_epd(img)
+        original_image = show_from_url(url, orientation)
+        # frameInstance.display_image_on_epd(original_image)
+        #TODO enable again...
+        mqtt_publisher.send_image(original_image)
 
         return jsonify({'success': True})
 
@@ -278,7 +293,9 @@ def send_to_frame():
         cached_image = cache.get(key)
         if cached_image:
             image = Image.open(BytesIO(cached_image))
-            frameInstance.display_image_on_epd(image)
+            # frameInstance.display_image_on_epd(image)
+            #TODO enable again...
+            mqtt_publisher.send_image(image)
             if should_save_image:
                 save_image_and_thumbnail(image, key)
             return jsonify({'success': True})

@@ -3,3 +3,4 @@ requests
 numpy
 pillow
 flask-caching
+paho-mqtt==1.5.1

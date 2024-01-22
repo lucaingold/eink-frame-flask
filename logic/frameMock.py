@@ -2,10 +2,7 @@ import logging
 import os
 # from omni_epd import displayfactory, EPDNotFoundError
 from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
-from hw.file_operations import FileOperations
-from hw.image_functions import ImageFunctions
 from constants import ConfigConst
-from hw.config_wrapper import Configs
 
 DISPLAY_TYPE = "waveshare_epd.it8951"
 
