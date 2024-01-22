@@ -1,15 +1,22 @@
 import base64
 import os
 import json
+import uuid
+from datetime import datetime
 from io import BytesIO
+from time import sleep
+
 from flask import Flask, render_template, jsonify, request, send_file
 from PIL import Image, ExifTags
 from hw.image_by_url import show_from_url
 from hw.mandelbrot import create_mandelbrot_image
 from hw.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
 from hw.unsplash import search_photo_by_keywords
+from flask_caching import Cache
 from hw.frame import EInkFrame
 # from hw.frameMock import EInkFrameMock
+
+THREE_MINUTES = 180
 
 file_path = os.getcwd()
 
@@ -19,6 +26,7 @@ frameInstance = EInkFrame()
 frameInstance.run()
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 
 @app.route('/')
@@ -70,8 +78,9 @@ def generate_ai_image():
 
         generated_image = get_image_from_string(positive_prompt, negative_prompt, art_type, engine_type, orientation)
         # frameInstance.display_image_on_epd(generated_image)
-
-        return return_image_json(generated_image)
+        filename = generate_file_name('ai')
+        save_image_in_cache(generated_image, filename)
+        return return_image_json(generated_image, filename)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -88,10 +97,9 @@ def search_photo():
             return jsonify({'error': 'Keywords are required'}), 400
         generated_image = search_photo_by_keywords(keywords, orientation, is_random)
         # frameInstance.display_image_on_epd(generated_image)
-
-        return return_image_json(generated_image)
-
-
+        filename = generate_file_name('photo')
+        save_image_in_cache(generated_image, filename)
+        return return_image_json(generated_image, filename)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -262,25 +270,61 @@ def load_image_from_url():
 @app.route('/sendToFrame', methods=['POST'])
 def send_to_frame():
     try:
-        uploaded_file = request.files['file']
-        if uploaded_file:
-            image = Image.open(uploaded_file)
+        data = request.json
+        key = data.get('key')
+        if not key:
+            return jsonify({'error': 'Key is required'}), 400
+        should_save_image = data.get('should_save_image')
+        cached_image = cache.get(key)
+        if cached_image:
+            image = Image.open(BytesIO(cached_image))
             frameInstance.display_image_on_epd(image)
-            print(1)
+            if should_save_image:
+                save_image_and_thumbnail(image, key)
             return jsonify({'success': True})
     except Exception as e:
         print('Error:', str(e))
         return jsonify({'success': False, 'error': str(e)})
 
 
-def return_image_json(pil_image, format='JPEG'):
+def save_image_and_thumbnail(image, filename):
+    try:
+        # Save image locally with formatted name
+        images_folder = os.path.join(app.static_folder, 'images', filename)
+        image.save(images_folder)
+
+        # Create and save thumbnail
+        thumbnail_folder = os.path.join(app.static_folder, 'pictures', filename)
+        thumbnail_size = (1000, 750)
+        thumbnail = image.resize(thumbnail_size)
+        thumbnail.save(thumbnail_folder)
+    except Exception as e:
+        print('Error:', str(e))
+        return {'success': False, 'error': str(e)}
+
+
+def generate_file_name(prefix):
+    current_datetime = datetime.now()
+    formatted_date = current_datetime.strftime('%Y_%m_%d')
+    unique_id = str(uuid.uuid4())[:8]  # Use the first 8 characters of the UUID
+    save_filename = f"{prefix}_{formatted_date}_{unique_id}.jpeg"
+    return save_filename
+
+
+def return_image_json(pil_image, filename, format='JPEG'):
     image_io = BytesIO()
     pil_image.save(image_io, format=format)
     image_bytes = image_io.getvalue()
     encoded_img = base64.b64encode(image_bytes).decode('ascii')
-    return jsonify({'success': True, "image": encoded_img})
+    return jsonify({'success': True, 'key': filename, "image": encoded_img})
+
+
+def save_image_in_cache(image, filename):
+    img_byte_arr = BytesIO()
+    image.save(img_byte_arr, format='JPEG')
+    cache.set(filename, img_byte_arr.getvalue(), timeout=THREE_MINUTES)
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=8080, debug=True)
-    app.run(host='0.0.0.0', port=8080, debug=False)
+    app.run(host='0.0.0.0', port=8080, debug=True)
+    # app.run(host='0.0.0.0', port=8080, debug=False)
