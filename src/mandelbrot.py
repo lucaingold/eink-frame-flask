@@ -1,9 +1,7 @@
 import logging
 import numpy as np
 from PIL import Image
-
-SCREEN_WIDTH = 1600
-SCREEN_HEIGHT = 1200
+from flask import current_app
 
 
 def mandelbrot(c, max_iter):
@@ -20,9 +18,11 @@ def mandelbrot(c, max_iter):
 
 def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=50):
     try:
-        screenWidth = 800
-        screenHeight = 600
-        x, y = np.meshgrid(np.linspace(xmin, xmax, screenWidth), np.linspace(ymin, ymax, screenHeight))
+        screen_width = int(current_app.config['SCREEN_WIDTH'])
+        screen_height = int(current_app.config['SCREEN_HEIGHT'])
+        genWidth = screen_width / 2
+        genHeight = screen_height / 2
+        x, y = np.meshgrid(np.linspace(xmin, xmax, genWidth), np.linspace(ymin, ymax, genHeight))
         c = x + 1j * y
         img = np.zeros(c.shape, dtype=int)
 
@@ -38,7 +38,7 @@ def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=50):
         img_array = np.stack((r, g, b), axis=-1).astype(np.uint8)
         img = Image.fromarray(img_array, 'RGB')
 
-        return img.resize(SCREEN_WIDTH, SCREEN_HEIGHT)
+        return img.resize(screen_width, screen_height)
     except BaseException as e:
         logging.error(e)
         return None

@@ -13,56 +13,26 @@
             margin-left: 0;
         }
 
-        .buttonIconLeft {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            margin-right: 0;
-            background: #161616;
-            border-color: #fff;
-        }
 
         .fullWidth {
             width: 100%;
         }
     </style>
 
+
     <div class="container">
-        <h1>AI Image Generator</h1>
-        <p>Generate an image with custom prompts using the text field below:</p>
+        <h1>API photo search</h1>
+        <p>Search a photo for custom keywords using the text field below:</p>
         <div class="input-group mb-3 p-0">
-            <span class="input-group-text buttonIconLeft"><i class="fa-solid fa-terminal"></i></span>
-            <textarea class="form-control" id="positive_prompt" placeholder="enter your prompt" rows="2"></textarea>
+            <input type="text" class="form-control" id="keywords" placeholder="Enter search keywords ...">
             <button class="btn btn-primary buttonRight" type="button" id="generateButton">
-                <i class="fas fa-magic"></i> Generate Image
+                <i class="fas fa-search"></i> Search Photo
             </button>
-        </div>
-        <div class="input-group mb-3 p-0">
-            <span class="input-group-text buttonIconLeft"><i class="fa-solid fa-ban"></i></span>
-            <input type="text" class="form-control" id="negative_prompt" placeholder="enter words to exclude">
         </div>
 
 
         <div class="container">
             <div class="row">
-                <div class="col-4 mb-3 p-0">
-                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
-                            id="artType">
-                        <option value="" disabled selected>Select Style</option>
-                        {% for art_type in art_types %}
-                            <option value="{{ art_type.name }}">{{ art_type.value.replace('-', ' ').title() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-4 mb-3 p-0">
-                    <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
-                            id="engineType">
-                        <option value="" disabled selected>Select Engine</option>
-                        {% for id, description in engines.items() %}
-                            <option value="{{ id }}"{% if id == 'stable-diffusion-v1-6' %}
-                                    selected{% endif %}>{{ description }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
                 <div class="col-4 mb-3 p-0">
                     <select class="custom-select btn btn-outline-secondary dropdown-toggle btn-primary buttonMiddle mr-0 fullWidth"
                             id="orientationType">
@@ -74,12 +44,11 @@
                     </select>
                 </div>
                 <div class="form-check" style="margin-bottom: 15px">
-                    <input class="form-check-input" type="checkbox" value="" id="optimize">
-                    <label class="form-check-label" for="optimize">
-                        Optimize for e-ink frame
+                    <input class="form-check-input" type="checkbox" value="" id="random">
+                    <label class="form-check-label" for="random">
+                        Randomize
                     </label>
                 </div>
-
             </div>
         </div>
 
@@ -89,7 +58,6 @@
                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Loading ...
             </div>
         </div>
-
     </div>
 
     <div class="modal " tabindex="-1" role="dialog" id="imageModal">
@@ -127,16 +95,16 @@
         </div>
     </div>
 
-
 {% endblock %}
 
 {% block scripts %}
 
     <script>
-        $(document).ready(function () {
-            var $progress = $('.progress');
 
-            $('#positive_prompt').on('keydown', function (event) {
+        $(document).ready(function () {
+            let $progress = $('.progress');
+
+            $('#keywords').on('keydown', function (event) {
                 if (event.which === 13) {
                     event.preventDefault();
                     $('#generateButton').click();
@@ -145,27 +113,21 @@
 
             $("#generateButton").on("click", function () {
                 $progress.show();
-                let positivePromptValue = $("#positive_prompt").val();
-                let negativePromptValue = $("#negative_prompt").val();
-                let artTypeValue = $("#artType").val();
-                let engineTypeValue = $("#engineType").val();
+                let keywordsValue = $("#keywords").val();
                 let orientationTypeValue = $("#orientationType").val();
-                let optimizedIsChecked = $("#optimize").prop("checked");
-                if (optimizedIsChecked) {
-                    positivePromptValue += ', grayscale, high contrast between motive and background';
-                }
-                if (positivePromptValue.trim() !== "") {
-                    let postData = {
-                        positive_prompt: positivePromptValue,
-                        negative_prompt: negativePromptValue,
-                        artType: artTypeValue,
-                        engineType: engineTypeValue,
-                        orientationType: orientationTypeValue
+                let randomIsChecked = $("#random").prop("checked");
+                if (keywordsValue.trim() !== "") {
+                    var postData = {
+                        keywords: keywordsValue,
+                        orientationType: orientationTypeValue,
+                        isRandom: randomIsChecked
                     };
-                    $.ajax('/ai/generate', {
+                    $.ajax('/search/searchPhoto', {
                         method: 'POST',
                         data: JSON.stringify(postData),
                         contentType: "application/json",
+                        beforeSend: function () {
+                        },
 
                         success: function (response) {
                             localStorage.setItem("filename", response["key"]);
@@ -182,11 +144,10 @@
                         },
                     });
                 } else {
-                    alert("Please enter a prompt before generating the image.");
+                    alert("Please enter keywords for searching a photo.");
                     $progress.hide();
                 }
             });
-
 
             $('#sendToFrameBtn').on('click', function () {
                 var $progressModal = $('.progressModal');
@@ -197,7 +158,7 @@
                 };
                 $.ajax({
                     type: "POST",
-                    url: "/ai/sendToFrame",
+                    url: "/search/sendToFrame",
                     data: JSON.stringify(postData),
                     contentType: 'application/json',
                     success: function (response) {

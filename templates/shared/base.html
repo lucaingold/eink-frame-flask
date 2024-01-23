@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    {% include "shared/header.html" %}
+    {% block header %} {% endblock %}
+</head>
+<body class="d-flex flex-column h-100">
+
+{% include "shared/navigation.html" %}
+
+<main class="flex-shrink-0">
+    {% block content %}{% endblock %}
+</main>
+{% include "shared/scripts.html" %}
+{% block scripts %} {% endblock %}
+
+{#{% include "shared/footer.html" %}#}
+
+</body>
+</html>

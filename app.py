@@ -1,346 +1,71 @@
-import base64
-import os
-import json
-import uuid
-from datetime import datetime
-from io import BytesIO
-from flask import Flask, render_template, jsonify, request, send_file
-from PIL import Image, ExifTags
-from src.image_by_url import show_from_url
-from src.mandelbrot import create_mandelbrot_image
+from flask import Flask
+from src.file_service import FileService
 from src.mqtt_publisher import MqttImagePublisher
-from src.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
-from src.unsplash import search_photo_by_keywords
-from flask_caching import Cache
-
-THREE_MINUTES = 180
-
-file_path = os.getcwd()
-
-
-def load_config():
-    with open("config.json", "r") as f:
-        return json.load(f)
-
-
-config = load_config()
-mqtt_publisher = MqttImagePublisher(config["broker_address"], config["username"], config["password"],
-                                    config["topic_image_display"], config["broker_port"])
-mqtt_publisher.connect()
-mqtt_publisher.start()
-
-app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
-
-
-@app.route('/')
-def start():
-    return render_template('start.html', title='E-Ink Frame')
-
-
-@app.route('/selector')
-def image_selector():
-    pictures_folder = os.path.join(app.static_folder, 'pictures')
-    pictures_paths = [os.path.join('pictures', filename) for filename in os.listdir(pictures_folder) if
-                      filename.endswith(('.jpeg'))]
-    return render_template('selector.html', title='Select Image', images=sorted(pictures_paths))
-
-
-@app.route('/upload')
-def image_upload():
-    return render_template('upload.html', title='Upload Image')
-
-
-@app.route('/ai')
-def ai_generator():
-    return render_template('ai.html', title='Ai Generator (Stable Diffusion)', art_types=ArtType,
-                           engines=list_engines(), orientation_types=Orientation)
-
-
-@app.route('/api')
-def unsplash_api():
-    return render_template('api.html', title='API photo search (Unsplash)', orientation_types=Orientation)
-
-
-@app.route('/mandelbrot')
-def mandelbrot():
-    return render_template('mandelbrot.html', title='Mandelbrot Set')
-
-
-@app.route('/url')
-def load_by_url():
-    return render_template('url.html', title='Show by url', orientation_types=Orientation)
-
-
-@app.route('/generateAiImage', methods=['POST'])
-def generate_ai_image():
-    try:
-        data = request.json
-        positive_prompt = data.get('positive_prompt')
-        negative_prompt = data.get('negative_prompt')
-        art_type = data.get('artType')
-        engine_type = data.get('engineType')
-        orientation = data.get('orientationType')
-
-        if not positive_prompt:
-            return jsonify({'error': 'Prompt is required'}), 400
-
-        generated_image = get_image_from_string(positive_prompt, negative_prompt, art_type, engine_type, orientation)
-        # frameInstance.display_image_on_epd(generated_image)
-        filename = generate_file_name('ai')
-        save_image_in_cache(generated_image, filename)
-        return return_image_json(generated_image, filename)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/searchPhoto', methods=['POST'])
-def search_photo():
-    try:
-        data = request.json
-        keywords = data.get('keywords')
-        orientation = data.get('orientationType')
-        is_random = data.get('isRandom')
-
-        if not keywords:
-            return jsonify({'error': 'Keywords are required'}), 400
-        generated_image = search_photo_by_keywords(keywords, orientation, is_random)
-        # frameInstance.display_image_on_epd(generated_image)
-        filename = generate_file_name('photo')
-        save_image_in_cache(generated_image, filename)
-        return return_image_json(generated_image, filename)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/uploadImage', methods=['POST'])
-def upload():
-    # Access the file from the request
-    uploaded_file = request.files['file']
-    if uploaded_file:
-        # Read the image using PIL
-        try:
-            original_image = Image.open(uploaded_file)
-            ow = str(original_image.width)
-            oh = str(original_image.height)
-            print(' h:' + oh)
-            print(' w:' + ow)
-            # Resize the image to 1600x1200
-            # target_width = 1600
-            # target_height = 1200
-            # resized_image = original_image.resize((target_width, target_height))
-            #
-            # orientation = get_orientation(original_image)
-            #
-            # if orientation:
-            #     # Use EXIF orientation information
-            #     if orientation == 3:
-            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_180)
-            #     elif orientation == 6:
-            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
-            #     elif orientation == 8:
-            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_90)
-            #     # Additional cases can be added based on the specific orientation values
-            # else:
-            #     # If no EXIF information, use width < height condition
-            #     if resized_image.width < resized_image.height:
-            #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
-
-            # frameInstance.display_image_on_epd(original_image)
-            mqtt_publisher.send_image(original_image)
-        except Exception as e:
-            return jsonify({'error': 'Failed to process image'}), 500
-        return json.dumps({'status': 'success', 'message': 'File uploaded successfully' + ' h:' + oh + ' w:' + ow})
-    else:
-        return json.dumps({'status': 'error', 'message': 'No file received'})
-
-
-@app.route('/sendImage', methods=['POST'])
-def send_image():
-    # Check if the request contains a file
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image provided'}), 400
-
-    # Get the image file from the request
-    image_file = request.files['image']
-
-    # Read the image using PIL
-    try:
-        original_image = Image.open(image_file)
-    except Exception as e:
-        return jsonify({'error': 'Failed to process image'}), 500
-
-    ow = str(original_image.width)
-    oh = str(original_image.height)
-
-    orientation = get_orientation(original_image)
-
-    if orientation:
-        # Use EXIF orientation information
-        if orientation == 3:
-            original_image = original_image.transpose(method=Image.Transpose.ROTATE_180)
-        elif orientation == 6:
-            original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
-        elif orientation == 8:
-            original_image = original_image.transpose(method=Image.Transpose.ROTATE_90)
-        # Additional cases can be added based on the specific orientation values
-    else:
-        # If no EXIF information, use width < height condition
-        if original_image.width < original_image.height:
-            original_image = original_image.transpose(method=Image.Transpose.ROTATE_270)
-
-    # Resize the image to 1600x1200
-    target_width = 1600
-    target_height = 1200
-    resized_image = original_image.resize((target_width, target_height))
-
-    # If the image needs to be cropped to the exact dimensions
-    # you can add additional src here based on your requirements
-
-    # Convert the image to BMP format
-    bmp_image = resized_image.convert('RGB')
-
-    # Save the BMP image to a BytesIO object
-    bmp_buffer = BytesIO()
-    # bmp_image.save(bmp_buffer, format='BMP')
-
-    # frameInstance.display_image_on_epd(bmp_image)
-    mqtt_publisher.send_image(original_image)
-
-    # Return the BMP image bytes as the response
-    #     return jsonify({'status': 'success', 'result': 'image processed' + 'W: ' + oh + ' H: ' + ow})
-    # return jsonify({'message': 'BMP image processed successfully ' + 'W: ' + oh + ' H: ' + ow,
-    #                 'bmp_image': bmp_buffer.getvalue().decode('latin-1')})
-
-    return jsonify({'success': True})
-
-
-def get_orientation(image):
-    # Check if image has EXIF orientation information
-    try:
-        for tag, value in image._getexif().items():
-            if ExifTags.TAGS.get(tag) == 'Orientation':
-                return value
-    except (AttributeError, KeyError, TypeError, IndexError):
-        pass
-
-    return None
-
-
-@app.route('/load', methods=['POST'])
-def load_image_by_path():
-    try:
-        data = request.get_json()
-        if 'path' in data:
-            image_path = data['path']
-            if os.path.isfile(image_path):
-                original_image = Image.open(image_path)
-                # frameInstance.display_image_on_epd(original_image)
-                mqtt_publisher.send_image(original_image)
-                return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
-            else:
-                return jsonify(
-                    {'status': 'error', 'message': 'File for provided path ' + image_path + ' does not exist.'})
-        else:
-            return jsonify({'status': 'error', 'message': 'Path not provided in the request body'})
-
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
-
-
-@app.route('/calculateMandelbrotImage')
-def calculate_mandelbrot_image():
-    try:
-        original_image = create_mandelbrot_image()
-        # frameInstance.display_image_on_epd(original_image)
-        mqtt_publisher.send_image(original_image)
-        return return_image_json(original_image)
-    except Exception as e:
-        # Handle exceptions as needed
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/loadImage', methods=['POST'])
-def load_image_from_url():
-    try:
-        data = request.json
-        url = data.get('url')
-        orientation = data.get('orientationType')
-
-        if not url:
-            return jsonify({'error': 'URL is required'}), 400
-
-        original_image = show_from_url(url, orientation)
-        # frameInstance.display_image_on_epd(original_image)
-        mqtt_publisher.send_image(original_image)
-
-        return jsonify({'success': True})
-
-    except Exception as e:
-        # Handle exceptions as needed
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/sendToFrame', methods=['POST'])
-def send_to_frame():
-    try:
-        data = request.json
-        key = data.get('key')
-        if not key:
-            return jsonify({'error': 'Key is required'}), 400
-        should_save_image = data.get('should_save_image')
-        cached_image = cache.get(key)
-        if cached_image:
-            image = Image.open(BytesIO(cached_image))
-            # frameInstance.display_image_on_epd(image)
-            mqtt_publisher.send_image(image)
-            if should_save_image:
-                save_image_and_thumbnail(image, key)
-            return jsonify({'success': True})
-    except Exception as e:
-        print('Error:', str(e))
-        return jsonify({'success': False, 'error': str(e)})
-
-
-def save_image_and_thumbnail(image, filename):
-    try:
-        # Save image locally with formatted name
-        images_folder = os.path.join(app.static_folder, 'images', filename)
-        image.save(images_folder)
-
-        # Create and save thumbnail
-        thumbnail_folder = os.path.join(app.static_folder, 'pictures', filename)
-        thumbnail_size = (1000, 750)
-        thumbnail = image.resize(thumbnail_size)
-        thumbnail.save(thumbnail_folder)
-    except Exception as e:
-        print('Error:', str(e))
-        return {'success': False, 'error': str(e)}
-
-
-def generate_file_name(prefix):
-    current_datetime = datetime.now()
-    formatted_date = current_datetime.strftime('%Y_%m_%d')
-    unique_id = str(uuid.uuid4())[:8]  # Use the first 8 characters of the UUID
-    save_filename = f"{prefix}_{formatted_date}_{unique_id}.jpeg"
-    return save_filename
-
-
-def return_image_json(pil_image, filename, format='JPEG'):
-    image_io = BytesIO()
-    pil_image.save(image_io, format=format)
-    image_bytes = image_io.getvalue()
-    encoded_img = base64.b64encode(image_bytes).decode('ascii')
-    return jsonify({'success': True, 'key': filename, "image": encoded_img})
-
-
-def save_image_in_cache(image, filename):
-    img_byte_arr = BytesIO()
-    image.save(img_byte_arr, format='JPEG')
-    cache.set(filename, img_byte_arr.getvalue(), timeout=THREE_MINUTES)
-
+from src.caching_service import CachingService
+from controller.ai_api import construct_blueprint as ai_api
+from controller.home_api import construct_blueprint as home_api
+from controller.load_url_api import construct_blueprint as load_from_url_api
+from controller.mandelbrot_api import construct_blueprint as mandelbrot_api
+from controller.search_api import construct_blueprint as search_api
+from controller.selector_api import construct_blueprint as selector_api
+from controller.upload_api import construct_blueprint as upload_api
+import configparser
+
+
+def create_app():
+    app = Flask(__name__)
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    load_config(config, app)
+    return app
+
+
+def load_config(config, app):
+    # MQTT
+    app.config['BROKER_ADDRESS'] = config.get('MQTT', 'BROKER_ADDRESS')
+    app.config['USERNAME'] = config.get('MQTT', 'USERNAME')
+    app.config['PASSWORD'] = config.get('MQTT', 'PASSWORD')
+    app.config['TOPIC_IMAGE_DISPLAY'] = config.get('MQTT', 'TOPIC_IMAGE_DISPLAY')
+    app.config['BROKER_PORT'] = config.get('MQTT', 'BROKER_PORT')
+    # App
+    app.config['CACHE_THRESHOLD_IN_SECONDS'] = config.get('APP', 'CACHE_THRESHOLD_IN_SECONDS')
+    # Screen
+    app.config['SCREEN_WIDTH'] = config.get('SCREEN', 'WIDTH')
+    app.config['SCREEN_HEIGHT'] = config.get('SCREEN', 'HEIGHT')
+    app.config['SCREEN_ASPECT_RATIO'] = config.get('SCREEN', 'ASPECT_RATIO')
+    # AI
+    app.config['CFG_SCALE'] = config.get('STABILITY_AI', 'CFG_SCALE')
+    app.config['AI_API_HOST'] = config.get('STABILITY_AI', 'API_HOST')
+    app.config['AI_API_KEY'] = config.get('STABILITY_AI', 'API_KEY')
+    # Unsplash
+    app.config['PHOTO_API_HOST'] = config.get('PHOTO_API', 'API_HOST')
+    app.config['PHOTO_CLIENT_ID'] = config.get('PHOTO_API', 'CLIENT_ID')
+
+
+def init_mqtt():
+    publisher = MqttImagePublisher()
+    publisher.connect()
+    publisher.start()
+    return publisher
+
+
+def register_blueprints():
+    app.register_blueprint(ai_api(caching_service, mqtt_publisher, file_service))
+    app.register_blueprint(home_api())
+    app.register_blueprint(load_from_url_api(mqtt_publisher))
+    app.register_blueprint(mandelbrot_api(mqtt_publisher, file_service))
+    app.register_blueprint(search_api(caching_service, mqtt_publisher, file_service))
+    app.register_blueprint(selector_api(mqtt_publisher, file_service))
+    app.register_blueprint(upload_api(mqtt_publisher, file_service))
+
+
+app = create_app()
+app.app_context().push()
+mqtt_publisher = init_mqtt()
+caching_service = CachingService(app)
+file_service = FileService(app)
+register_blueprints()
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # app.run(host='0.0.0.0', port=8080, debug=True)
-    # app.run(host='0.0.0.0', port=8080, debug=False)
+    app.debug = True
+    app.run(host='0.0.0.0')

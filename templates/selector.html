@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 {% block header %}
     <!-- Custom styles for this site -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/selector.css') }}"/>
@@ -20,8 +20,8 @@
             let item = {
                 id: i,
                 title: `Click to send to Ink-Frame`,
-                image: `static/` + images[imageIndex],
-                path: `static/images` + images[imageIndex].replace('pictures', '').replace('.jpeg', '.bmp'),
+                image: `/static/images/` + images[imageIndex],
+                path: images[imageIndex].replace('_thumb', ''),
             };
             console.log(images[imageIndex])
             posts.push(item);
@@ -29,7 +29,5 @@
             if (imageIndex > images.length - 1) imageIndex = 0;
         }
     </script>
-
-    <script src="{{ url_for('static', filename='js/items.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

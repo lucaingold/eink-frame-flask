@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 {% block content %}
 
 
@@ -32,7 +32,7 @@
             var $progressBar = $('.progress-bar');
             $("#generateButton").on("click", function () {
                 $progress.show();
-                $.ajax('/calculateMandelbrotImage', {
+                $.ajax('/calculate', {
                     method: 'GET',
                     beforeSend: function () {
                     },

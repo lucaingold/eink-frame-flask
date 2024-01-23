@@ -3,4 +3,5 @@ requests
 numpy
 pillow
 flask-caching
+flask-injector
 paho-mqtt==1.5.1
