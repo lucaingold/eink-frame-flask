@@ -1,5 +1,7 @@
 {
-  "broker_address": "192.168.0.40",
-  "broker_port": 1883,
-  "topic_image_display": "server/image/display"
+  "broker_address": "1267e5cf620940ea957ccaedca8add6a.s2.eu.hivemq.cloud",
+  "broker_port": 8883,
+  "topic_image_display": "server/image/display",
+  "username": "einkframe",
+  "password": "36WLktfFjTr2J0LxZ52ZFVuFJs"
 }

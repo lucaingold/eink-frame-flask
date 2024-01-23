@@ -1,0 +1,34 @@
+.home_icon {
+    color: black;
+}
+
+.home_body {
+    color: black;
+}
+
+.card {
+    border: none;
+    box-shadow: none;
+}
+
+.card-text {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+.card {
+    transition: transform 0.3s;
+    border-radius: 0;
+}
+
+.card:hover {
+    transform: scale(0.97);
+}
+
+.device-icon {
+    font-size: 3em; /* Adjust the font size for the device icon */
+}
+
+.online-icon {
+    color: green; /* Set the color for the online indicator */
+}

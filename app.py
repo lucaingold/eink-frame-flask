@@ -4,7 +4,6 @@ import json
 import uuid
 from datetime import datetime
 from io import BytesIO
-
 from flask import Flask, render_template, jsonify, request, send_file
 from PIL import Image, ExifTags
 from logic.image_by_url import show_from_url
@@ -14,19 +13,19 @@ from logic.stabilityai import get_image_from_string, ArtType, list_engines, Orie
 from logic.unsplash import search_photo_by_keywords
 from flask_caching import Cache
 
-# from logic.frame import EInkFrame
-# from logic.frameMock import EInkFrameMock
-
 THREE_MINUTES = 180
 
 file_path = os.getcwd()
 
-# frameInstance = EInkFrame()
-# frameInstance = EInkFrameMock()
 
-# frameInstance.run()
+def load_config():
+    with open("config.json", "r") as f:
+        return json.load(f)
 
-mqtt_publisher = MqttImagePublisher("192.168.0.40", "server/image/display")
+
+config = load_config()
+mqtt_publisher = MqttImagePublisher(config["broker_address"], config["username"], config["password"],
+                                    config["topic_image_display"], config["broker_port"])
 mqtt_publisher.connect()
 mqtt_publisher.start()
 
@@ -35,6 +34,11 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 
 @app.route('/')
+def start():
+    return render_template('start.html', title='E-Ink Frame')
+
+
+@app.route('/selector')
 def image_selector():
     pictures_folder = os.path.join(app.static_folder, 'pictures')
     pictures_paths = [os.path.join('pictures', filename) for filename in os.listdir(pictures_folder) if
@@ -143,7 +147,6 @@ def upload():
             #         resized_image = resized_image.transpose(method=Image.Transpose.ROTATE_270)
 
             # frameInstance.display_image_on_epd(original_image)
-            #TODO enable again...
             mqtt_publisher.send_image(original_image)
         except Exception as e:
             return jsonify({'error': 'Failed to process image'}), 500
@@ -202,7 +205,6 @@ def send_image():
     # bmp_image.save(bmp_buffer, format='BMP')
 
     # frameInstance.display_image_on_epd(bmp_image)
-    #TODO enable again...
     mqtt_publisher.send_image(original_image)
 
     # Return the BMP image bytes as the response
@@ -234,7 +236,6 @@ def load_image_by_path():
             if os.path.isfile(image_path):
                 original_image = Image.open(image_path)
                 # frameInstance.display_image_on_epd(original_image)
-                #TODO enable again...
                 mqtt_publisher.send_image(original_image)
                 return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
             else:
@@ -252,7 +253,6 @@ def calculate_mandelbrot_image():
     try:
         original_image = create_mandelbrot_image()
         # frameInstance.display_image_on_epd(original_image)
-        #TODO enable again...
         mqtt_publisher.send_image(original_image)
         return return_image_json(original_image)
     except Exception as e:
@@ -272,7 +272,6 @@ def load_image_from_url():
 
         original_image = show_from_url(url, orientation)
         # frameInstance.display_image_on_epd(original_image)
-        #TODO enable again...
         mqtt_publisher.send_image(original_image)
 
         return jsonify({'success': True})
@@ -294,7 +293,6 @@ def send_to_frame():
         if cached_image:
             image = Image.open(BytesIO(cached_image))
             # frameInstance.display_image_on_epd(image)
-            #TODO enable again...
             mqtt_publisher.send_image(image)
             if should_save_image:
                 save_image_and_thumbnail(image, key)
@@ -343,5 +341,6 @@ def save_image_in_cache(image, filename):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(debug=True)
+    # app.run(host='0.0.0.0', port=8080, debug=True)
     # app.run(host='0.0.0.0', port=8080, debug=False)

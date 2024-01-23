@@ -11,7 +11,6 @@
 }
 
 html, body {
-    overflow: hidden;
     background-color: #000000;
     color: white;
 }
@@ -31,6 +30,9 @@ header {
     /*height: 150px; !* Adjust the height as needed *!*/
 }
 
+main {
+    margin-top: 100px;
+}
 
 .navbar {
     display: flex;
