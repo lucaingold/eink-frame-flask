@@ -6,11 +6,11 @@ from datetime import datetime
 from io import BytesIO
 from flask import Flask, render_template, jsonify, request, send_file
 from PIL import Image, ExifTags
-from logic.image_by_url import show_from_url
-from logic.mandelbrot import create_mandelbrot_image
-from logic.mqtt_publisher import MqttImagePublisher
-from logic.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
-from logic.unsplash import search_photo_by_keywords
+from src.image_by_url import show_from_url
+from src.mandelbrot import create_mandelbrot_image
+from src.mqtt_publisher import MqttImagePublisher
+from src.stabilityai import get_image_from_string, ArtType, list_engines, Orientation
+from src.unsplash import search_photo_by_keywords
 from flask_caching import Cache
 
 THREE_MINUTES = 180
@@ -195,7 +195,7 @@ def send_image():
     resized_image = original_image.resize((target_width, target_height))
 
     # If the image needs to be cropped to the exact dimensions
-    # you can add additional logic here based on your requirements
+    # you can add additional src here based on your requirements
 
     # Convert the image to BMP format
     bmp_image = resized_image.convert('RGB')
