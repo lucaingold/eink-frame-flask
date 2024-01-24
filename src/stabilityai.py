@@ -131,6 +131,7 @@ class StabilityAI:
             "Authorization": f"Bearer {self.api_key}"
         }
         url = f"{self.api_host}/v1/engines/list"
+        print(url)
         response = requests.request("GET", url, headers=headers, data=payload)
         if response.status_code == 200:
             data = response.json()

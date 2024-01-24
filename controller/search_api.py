@@ -8,7 +8,7 @@ from src.unsplash import UnsplashAPI
 
 def construct_blueprint(caching_service, mqtt_publisher, file_service):
     blueprint = Blueprint('search-api', __name__, url_prefix='/search')
-    photo_api = UnsplashAPI
+    photo_api = UnsplashAPI()
 
     @blueprint.route('/')
     def unsplash_api():
@@ -21,7 +21,6 @@ def construct_blueprint(caching_service, mqtt_publisher, file_service):
             keywords = data.get('keywords')
             orientation = data.get('orientationType')
             is_random = data.get('isRandom')
-
             if not keywords:
                 return jsonify({'error': 'Keywords are required'}), 400
             generated_image = photo_api.search_photo_by_keywords(keywords, orientation, is_random)

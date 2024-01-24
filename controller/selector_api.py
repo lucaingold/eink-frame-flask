@@ -18,8 +18,6 @@ def construct_blueprint(mqtt_publisher, file_service):
             if 'path' in data:
                 image_path = data['path']
                 image = file_service.get_image_from_path(image_path)
-                print(111)
-                print(image)
                 mqtt_publisher.send_image(image)
                 return jsonify({'status': 'success', 'result': 'image with path' + image_path + ' processed'})
             else:

@@ -21,7 +21,7 @@ class UnsplashAPI:
         self.screen_height = int(current_app.config['SCREEN_HEIGHT'])
         pass
 
-    def search_photo_by_keywords(self, keywords, orientation, is_random):
+    def search_photo_by_keywords(self, keywords, orientation, is_random=False):
         global img
         try:
             if self.client_id is None:
@@ -46,16 +46,12 @@ class UnsplashAPI:
 
     def crop_and_resize_image(self, img):
         try:
-            # Crop the image to a 4:3 aspect ratio
-            aspect_ratio = self.screen_ratio
+            aspect_ratio = 4 / 3
             new_width = int(img.height * aspect_ratio)
             left_margin = (img.width - new_width) // 2
             right_margin = img.width - left_margin
             cropped_img = img.crop((left_margin, 0, right_margin, img.height))
-
-            # Resize the image to 1600x1200
             resized_img = cropped_img.resize((self.screen_width, self.screen_height))
-
             return resized_img
         except Exception as e:
             logging.error(f"Error in crop_and_resize_image: {e}")
@@ -71,7 +67,6 @@ class UnsplashAPI:
         else:
             url = f"{self.api_host}/search/photos?client_id={self.client_id}&orientation={api_orientation}&query={quote(str(keywords))}"
         response = requests.get(url)
-        print(url)
         if response.status_code != 200:
             raise Exception("Non-200 response: " + str(response.text) + 'URL:' + url)
         data = response.json()

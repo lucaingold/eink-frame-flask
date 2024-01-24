@@ -1,5 +1,5 @@
+from PIL import Image
 from flask import Blueprint, render_template, jsonify
-from src.mandelbrot import create_mandelbrot_image
 
 
 def construct_blueprint(mqtt_publisher, file_service):
@@ -12,9 +12,12 @@ def construct_blueprint(mqtt_publisher, file_service):
     @blueprint.route('/calculate')
     def calculate_mandelbrot_image():
         try:
-            original_image = create_mandelbrot_image()
-            mqtt_publisher.send_image(original_image)
-            return file_service.return_image_json(original_image)
+            size = (1600, 1200)
+            extent = (-2, -2, 2, 2)
+            quality = 128
+            mandelbrot = Image.effect_mandelbrot(size, extent, quality)
+            mqtt_publisher.send_image(mandelbrot)
+            return file_service.return_image_json(mandelbrot, 'mandelbrot')
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 

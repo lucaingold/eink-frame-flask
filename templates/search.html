@@ -135,8 +135,8 @@
                             $('#imageModal').modal('show');
                         },
 
-                        error: function () {
-                            console.log('Upload error');
+                        error: function (e) {
+                            console.log('Upload error', e);
                         },
 
                         complete: function () {

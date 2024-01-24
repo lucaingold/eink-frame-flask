@@ -23,7 +23,6 @@
                 image: `/static/images/` + images[imageIndex],
                 path: images[imageIndex].replace('_thumb', ''),
             };
-            console.log(images[imageIndex])
             posts.push(item);
             imageIndex++;
             if (imageIndex > images.length - 1) imageIndex = 0;
