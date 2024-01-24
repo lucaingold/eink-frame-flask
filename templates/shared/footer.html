@@ -53,7 +53,7 @@
                     .replace('{status}', device_status_payload['status'])
                     .replace('{class}', status === 'online' ? 'green' : 'red');
                 $('.device_status').html(filledContent);
-                localStorage.setItem('device_status', status);
+                localStorage.setItem('last_device_status', JSON.stringify(device_status_payload));
             });
         });
     </script>

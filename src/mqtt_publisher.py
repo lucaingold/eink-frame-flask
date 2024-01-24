@@ -11,7 +11,13 @@ class MqttImagePublisher:
     def __init__(self, app, callback):
         self.app = app
         self.callback = callback
-        self.device_status = None
+        self.device_status = {
+            "hostname": '?',
+            "ip_address": '?',
+            "mac": '?',
+            'status': 'unknown'
+        }
+        self.devices = current_app.config['DEVICES']
         self.broker_address = current_app.config['BROKER_ADDRESS']
         self.port = current_app.config['BROKER_PORT']
         self.client = mqtt.Client()
@@ -45,11 +51,12 @@ class MqttImagePublisher:
     def on_message(self, client, userdata, msg):
         if msg.topic.endswith("/status/online"):
             device_id = msg.topic.split('/')[1]
-            payload_dict = json.loads(msg.payload.decode('utf-8'))
-            status_value = payload_dict.get('status', 'unknown')
-            print(f"Device {device_id} is {status_value}")
-            self.device_status = payload_dict
-            self.callback.send(self.app, payload=payload_dict)
+            if device_id in self.devices:
+                payload_dict = json.loads(msg.payload.decode('utf-8'))
+                status_value = payload_dict.get('status', 'unknown')
+                print(f"Device {device_id} is {status_value}")
+                self.device_status = payload_dict
+                self.callback.send(self.app, payload=payload_dict)
 
     def send_image(self, pil_image):
         try:
