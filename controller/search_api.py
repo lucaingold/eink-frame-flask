@@ -12,7 +12,10 @@ def construct_blueprint(caching_service, mqtt_publisher, file_service):
 
     @blueprint.route('/')
     def unsplash_api():
-        return render_template('search.html', title='API photo search (Unsplash)', orientation_types=Orientation)
+        return render_template('search.html',
+                               title='API photo search (Unsplash)',
+                               status=mqtt_publisher.get_latest_device_status(),
+                               orientation_types=Orientation)
 
     @blueprint.route('/searchPhoto', methods=['POST'])
     def search_photo():

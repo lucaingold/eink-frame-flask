@@ -12,6 +12,7 @@ def construct_blueprint(caching_service, mqtt_publisher, file_service):
     def ai_generator():
         return render_template('ai.html',
                                title='Ai Generator (Stable Diffusion)',
+                               status=mqtt_publisher.get_latest_device_status(),
                                art_types=ArtType,
                                engines=ai_api.list_engines(),
                                orientation_types=Orientation)

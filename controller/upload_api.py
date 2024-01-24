@@ -8,7 +8,9 @@ def construct_blueprint(mqtt_publisher, file_service):
 
     @blueprint.route('/')
     def image_upload():
-        return render_template('upload.html', title='Upload Image')
+        return render_template('upload.html',
+                               status=mqtt_publisher.get_latest_device_status(),
+                               title='Upload Image')
 
     @blueprint.route('/upload', methods=['POST'])
     def upload():

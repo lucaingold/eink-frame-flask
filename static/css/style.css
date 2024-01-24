@@ -140,3 +140,15 @@ main {
     border-color: #fff;
 }
 
+.device_status{
+    font-size: 13px;
+}
+
+
+.green {
+    color: green !important;
+}
+
+.red {
+    color: red !important;
+}

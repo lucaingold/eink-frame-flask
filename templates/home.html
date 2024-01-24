@@ -6,17 +6,23 @@
 {% block content %}
     <div class="container">
         <h1 class="d-inline me-2 ">Welcome </h1>
-        <span class="badge text-bg-dark">
-        E-Ink-Frame [192.168.0.48] is online <i class="fas fa-circle online-icon"></i>
-    </span>
+        <span class="badge text-bg-dark device_status">
+        </span>
         <p>Use the functions below to display a picture on the frame:</p>
 
         <div class="row" id="card-container"></div>
     </div>
 {% endblock %}
 {% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"
+            integrity="sha512-tE1z+95+lMCGwy+9PnKgUSIeHhvioC9lMlI7rLWU0Ps3XTdjRygLcy4mLuL0JAoK4TLdQEyP0yOl/9dMOqpH/Q=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+        var socket;
+
+
         $(document).ready(function () {
+
             const cardData = [
                 {iconClass: 'fas fa-search fa-4x', description: 'API Image search', link: '/search'},
                 {iconClass: 'fas fa-magic fa-4x', description: 'AI Image Generation', link: '/ai'},
@@ -47,4 +53,5 @@
             }
         });
     </script>
+
 {% endblock %}

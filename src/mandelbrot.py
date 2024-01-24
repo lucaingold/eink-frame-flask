@@ -21,8 +21,8 @@ def mandelbrot(c, max_iter):
 
 def create_mandelbrot_image(xmin=-2, xmax=1, ymin=-1.5, ymax=1.5, max_iter=100):
     try:
-        screen_width = int(current_app.config['SCREEN_WIDTH'])
-        screen_height = int(current_app.config['SCREEN_HEIGHT'])
+        screen_width = current_app.config['SCREEN_WIDTH']
+        screen_height = current_app.config['SCREEN_HEIGHT']
 
         # image size
         WIDTH = 512

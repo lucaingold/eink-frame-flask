@@ -7,7 +7,9 @@ def construct_blueprint(mqtt_publisher, file_service):
 
     @blueprint.route('/')
     def mandelbrot():
-        return render_template('mandelbrot.html', title='Mandelbrot Set')
+        return render_template('mandelbrot.html',
+                               title='Mandelbrot Set',
+                               status=mqtt_publisher.get_latest_device_status())
 
     @blueprint.route('/calculate')
     def calculate_mandelbrot_image():

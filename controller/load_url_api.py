@@ -8,7 +8,10 @@ def construct_blueprint(mqtt_publisher):
 
     @blueprint.route('/')
     def load_by_url():
-        return render_template('url.html', title='Show by url', orientation_types=Orientation)
+        return render_template('url.html',
+                               title='Show by url',
+                               status=mqtt_publisher.get_latest_device_status(),
+                               orientation_types=Orientation)
 
     @blueprint.route('/load', methods=['POST'])
     def load_image_from_url():

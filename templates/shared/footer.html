@@ -1,13 +1,13 @@
 <footer class="footer mt-auto py-3 ">
     <div class="container footer-container">
         <div class="row col-12">
-            <div class="row col-12 right-div">
-            <span class="clearfix">
-            Crafted with <i class="fa fa-heart text-city"></i> by <a>lucaingold</a>
+            <span class="device_status" class="clearfix">
+                E-Ink-Frame [{{ status.ip_address }}] is {{ status.status }} <i
+                    class="fas fa-circle online-icon {{ 'green' if status.status.lower() == 'online' else 'red' }}"></i>
             </span>
-            </div>
-
-
+            <script>
+                localStorage.setItem('device_status', {{ status.status }});
+            </script>
         </div>
     </div>
 
@@ -33,3 +33,29 @@
     }
 
 </style>
+
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"
+            integrity="sha512-tE1z+95+lMCGwy+9PnKgUSIeHhvioC9lMlI7rLWU0Ps3XTdjRygLcy4mLuL0JAoK4TLdQEyP0yOl/9dMOqpH/Q=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        var socket;
+
+
+        $(document).ready(function () {
+            socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('device_status_changed', function (device_status_payload) {
+                const placeholderContent = 'E-Ink-Frame [{ip}] is {status} <i class="fas fa-circle online-icon {class}"></i>';
+                let status = device_status_payload['status']
+                let filledContent = placeholderContent
+                    .replace('{ip}', device_status_payload['ip_address'])
+                    .replace('{status}', device_status_payload['status'])
+                    .replace('{class}', status === 'online' ? 'green' : 'red');
+                $('.device_status').html(filledContent);
+                localStorage.setItem('device_status', status);
+            });
+        });
+    </script>
+
+{% endblock %}

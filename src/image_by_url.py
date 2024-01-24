@@ -33,13 +33,13 @@ def show_from_url(url, orientation):
 
 def crop_and_resize_image(img):
     try:
-        aspect_ratio = float(current_app.config['SCREEN_ASPECT_RATIO'])
+        aspect_ratio = current_app.config['SCREEN_ASPECT_RATIO']
         new_width = int(img.height * aspect_ratio)
         left_margin = (img.width - new_width) // 2
         right_margin = img.width - left_margin
         cropped_img = img.crop((left_margin, 0, right_margin, img.height))
 
-        resized_img = cropped_img.resize(int(current_app.config['SCREEN_WIDTH']), int(current_app.config['SCREEN_HEIGHT']))
+        resized_img = cropped_img.resize(current_app.config['SCREEN_WIDTH'], current_app.config['SCREEN_HEIGHT'])
 
         return resized_img
     except Exception as e:

@@ -26,9 +26,5 @@
 }
 
 .device-icon {
-    font-size: 3em; /* Adjust the font size for the device icon */
-}
-
-.online-icon {
-    color: green; /* Set the color for the online indicator */
+    font-size: 3em;
 }

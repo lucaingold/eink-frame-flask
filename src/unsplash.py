@@ -17,8 +17,8 @@ class UnsplashAPI:
         self.api_host = current_app.config['PHOTO_API_HOST']
         self.client_id = current_app.config['PHOTO_CLIENT_ID']
         self.screen_ratio = float(current_app.config['SCREEN_ASPECT_RATIO'])
-        self.screen_width = int(current_app.config['SCREEN_WIDTH'])
-        self.screen_height = int(current_app.config['SCREEN_HEIGHT'])
+        self.screen_width = current_app.config['SCREEN_WIDTH']
+        self.screen_height = current_app.config['SCREEN_HEIGHT']
         pass
 
     def search_photo_by_keywords(self, keywords, orientation, is_random=False):

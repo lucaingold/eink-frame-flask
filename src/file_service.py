@@ -20,8 +20,8 @@ def add_thumb_to_filename(filename):
 class FileService:
     def __init__(self, app):
         self.static_folder = app.static_folder
-        self.screen_width = int(current_app.config['SCREEN_WIDTH'])
-        self.screen_height = int(current_app.config['SCREEN_HEIGHT'])
+        self.screen_width = current_app.config['SCREEN_WIDTH']
+        self.screen_height = current_app.config['SCREEN_HEIGHT']
         pass
 
     def get_root_path(self):
@@ -43,7 +43,7 @@ class FileService:
 
             # Create and save thumbnail
             thumbnail_folder = os.path.join(self.static_folder, 'images', add_thumb_to_filename(filename))
-            thumbnail_size = (int(self.screen_width / 2), int(self.screen_height / 2))
+            thumbnail_size = self.screen_width / 2, self.screen_height / 2
             thumbnail = image.resize(thumbnail_size)
             thumbnail.save(thumbnail_folder)
         except Exception as e:

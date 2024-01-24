@@ -4,7 +4,7 @@ from flask import current_app
 
 
 def get_threshold():
-    return int(current_app.config['CACHE_THRESHOLD_IN_SECONDS'])
+    return current_app.config['CACHE_THRESHOLD_IN_SECONDS']
 
 
 class CachingService:

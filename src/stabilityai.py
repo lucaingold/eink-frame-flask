@@ -50,9 +50,9 @@ class StabilityAI:
     def __init__(self):
         self.api_key = current_app.config['AI_API_KEY']
         self.api_host = current_app.config['AI_API_HOST']
-        self.api_cfg_scale = int(current_app.config['CFG_SCALE'])
-        self.screen_width = int(current_app.config['SCREEN_WIDTH'])
-        self.screen_height = int(current_app.config['SCREEN_HEIGHT'])
+        self.api_cfg_scale = current_app.config['CFG_SCALE']
+        self.screen_width = current_app.config['SCREEN_WIDTH']
+        self.screen_height = current_app.config['SCREEN_HEIGHT']
         self.screen_aspect_ratio = float(current_app.config['SCREEN_ASPECT_RATIO'])
         pass
 

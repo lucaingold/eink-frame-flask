@@ -8,7 +8,9 @@ def construct_blueprint(mqtt_publisher, file_service):
 
     @blueprint.route('/')
     def image_selector():
-        return render_template('selector.html', title='Select Image',
+        return render_template('selector.html',
+                               title='Select Image',
+                               status=mqtt_publisher.get_latest_device_status(),
                                images=sorted(file_service.get_all_thumbnails_from_image_folder()))
 
     @blueprint.route('/load', methods=['POST'])
