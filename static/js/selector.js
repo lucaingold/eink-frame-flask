@@ -52,14 +52,15 @@ function showImage(path) {
             alert("Error! See console for more information.")
         },
         complete: function () {
-            $('#spinner-container').hide();
+            setTimeout(function () {
+                $('#spinner-container').hide();
+            }, 2200);
         }
     });
 }
 
 
 let previousScreenSize = innerWidth;
-console.log(previousScreenSize);
 
 window.addEventListener('resize', () => {
     imageIndex = 0;

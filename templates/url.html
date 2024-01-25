@@ -94,7 +94,9 @@
                         },
 
                         complete: function () {
-                            $progress.hide();
+                            setTimeout(function () {
+                                $progress.hide();
+                            }, 2200);
                         },
                     });
                 } else {

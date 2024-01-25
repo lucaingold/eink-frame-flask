@@ -21,7 +21,7 @@ class MqttImagePublisher:
         self.broker_address = current_app.config['BROKER_ADDRESS']
         self.port = current_app.config['BROKER_PORT']
         self.client = mqtt.Client()
-        mqtt_password = os.environ.get('MQTT_PW', '1234')
+        mqtt_password = current_app.config['PASSWORD']
         if (mqtt_password):
             self.client.username_pw_set(current_app.config['USERNAME'], mqtt_password)
             self.client.tls_set()
@@ -64,7 +64,7 @@ class MqttImagePublisher:
             pil_image.convert("RGB").save(img_byte_array, format="JPEG")
             for device_id in current_app.config['DEVICES']:
                 topic = self.topic_send_image.replace('+', device_id)
-                self.client.publish(topic, img_byte_array.getvalue(), qos=1)
+                self.client.publish(topic, img_byte_array.getvalue(), qos=2, retain=True)
                 print(f"Image sent to {topic}")
         except Exception as e:
             print("Error sending the image:", str(e))

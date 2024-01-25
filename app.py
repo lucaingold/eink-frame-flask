@@ -2,7 +2,7 @@ from time import sleep
 
 import socketio
 from flask import Flask
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 
 from src.file_service import FileService
 from src.mqtt_publisher import MqttImagePublisher
@@ -87,8 +87,4 @@ file_service = FileService(app)
 register_blueprints()
 
 if __name__ == '__main__':
-    app.debug = True
-    socketio.run(app, host='0.0.0.0', debug=True)
-    while True:
-        emit('device_status_changed', {'text': 'Message received!'})
-        sleep(6)
+    socketio.run(app, host='0.0.0.0')

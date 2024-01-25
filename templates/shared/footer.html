@@ -5,9 +5,6 @@
                 E-Ink-Frame [{{ status.ip_address }}] is {{ status.status }} <i
                     class="fas fa-circle online-icon {{ 'green' if status.status.lower() == 'online' else 'red' }}"></i>
             </span>
-            <script>
-                localStorage.setItem('device_status', {{ status.status }});
-            </script>
         </div>
     </div>
 

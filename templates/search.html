@@ -162,9 +162,11 @@
                     data: JSON.stringify(postData),
                     contentType: 'application/json',
                     success: function (response) {
-                        console.log("Image uploaded successfully:", response);
-                        $('#imageModal').modal('hide');
-                        $progressModal.hide();
+                        setTimeout(function () {
+                            console.log("Image uploaded successfully:", response);
+                            $('#imageModal').modal('hide');
+                            $progressModal.hide();
+                        }, 2200);
                     },
                     error: function (error) {
                         console.error("Error uploading image:", error);
