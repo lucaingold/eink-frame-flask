@@ -43,7 +43,7 @@ class FileService:
 
             # Create and save thumbnail
             thumbnail_folder = os.path.join(self.static_folder, 'images', add_thumb_to_filename(filename))
-            thumbnail_size = self.screen_width / 2, self.screen_height / 2
+            thumbnail_size = int(self.screen_width / 2), int(self.screen_height / 2)
             thumbnail = image.resize(thumbnail_size)
             thumbnail.save(thumbnail_folder)
         except Exception as e:
