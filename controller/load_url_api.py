@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, jsonify, request
-from src.image_by_url import show_from_url
+from src.image_by_url import ImageByUrl
 from src.stabilityai import Orientation
 
 
-def construct_blueprint(mqtt_publisher):
+def construct_blueprint(mqtt_publisher, file_service):
     blueprint = Blueprint('url-api', __name__, url_prefix='/url')
 
     @blueprint.route('/')
@@ -19,13 +19,13 @@ def construct_blueprint(mqtt_publisher):
             data = request.json
             url = data.get('url')
             orientation = data.get('orientationType')
-
+            should_save_image = data.get('should_save_image')
             if not url:
                 return jsonify({'error': 'URL is required'}), 400
-
-            original_image = show_from_url(url, orientation)
+            original_image = ImageByUrl().show_from_url(url, orientation)
             mqtt_publisher.send_image(original_image)
-
+            if should_save_image:
+                file_service.save_image_and_thumbnail(original_image, file_service.generate_file_name('url'))
             return jsonify({'success': True})
 
         except Exception as e:

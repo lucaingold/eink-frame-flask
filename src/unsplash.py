@@ -1,6 +1,6 @@
 import logging
 from PIL import Image
-from pip._vendor.six import BytesIO
+from io import BytesIO
 import requests
 from enum import Enum
 from urllib.parse import quote

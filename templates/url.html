@@ -37,16 +37,25 @@
                             id="orientationType">
                         <option value="" disabled selected>Select Orientation</option>
                         {% for orientation_type in orientation_types %}
-                            <option value="{{ orientation_type.name }}" {% if orientation_type.name == 'HORIZONTALLY' %}selected{% endif %}>{{ orientation_type.value }}</option>
+                            <option value="{{ orientation_type.name }}"
+                                    {% if orientation_type.name == 'HORIZONTALLY' %}selected{% endif %}>{{ orientation_type.value }}</option>
                         {% endfor %}
                     </select>
                 </div>
+
+                <div class="form-check" style="margin-bottom: 15px">
+                    <input class="form-check-input" type="checkbox" value="" id="saveImage">
+                    <label class="form-check-label" for="saveImage">
+                        Save image
+                    </label>
+                </div>
+
             </div>
         </div>
 
 
         <div class="progress" style="display: none;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated"  role="progressbar" style="width: 100%"
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"
                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Loading ...
             </div>
         </div>
@@ -73,12 +82,12 @@
                 let urlValue = $("#url").val();
                 let orientationTypeValue = $("#orientationType").val();
                 if (urlValue.trim() !== "") {
-                    var postData = {
+                    const postData = {
                         url: urlValue,
                         orientationType: orientationTypeValue,
+                        should_save_image: $("#saveImage").prop("checked")
                     };
-                    console.log()
-                    $.ajax('/load', {
+                    $.ajax('/url/load', {
                         method: 'POST',
                         data: JSON.stringify(postData),
                         contentType: "application/json",

@@ -61,7 +61,7 @@ def init_mqtt(callback):
 def register_blueprints():
     app.register_blueprint(ai_api(caching_service, mqtt_publisher, file_service))
     app.register_blueprint(home_api(mqtt_publisher))
-    app.register_blueprint(load_from_url_api(mqtt_publisher))
+    app.register_blueprint(load_from_url_api(mqtt_publisher, file_service))
     app.register_blueprint(mandelbrot_api(mqtt_publisher, file_service))
     app.register_blueprint(search_api(caching_service, mqtt_publisher, file_service))
     app.register_blueprint(selector_api(mqtt_publisher, file_service))

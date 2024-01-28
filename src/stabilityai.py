@@ -64,7 +64,7 @@ class StabilityAI:
                 raise Exception("Missing Stability API key.")
 
             payload = self.generate_style_preset_payload(positive_prompt, negative_prompt, art_type, fetch_height,
-                                                    fetch_width)
+                                                         fetch_width)
             print(str(payload))
             data = self.trigger_request(engine_type, payload)
             # data = None
